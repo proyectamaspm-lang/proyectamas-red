@@ -1,0 +1,1689 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Red Proyecta Más</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bangers&family=Barlow:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: hoja de plano clara (cuadrícula azul tenue) — hero con mancha amarilla irregular, tablero de fichas con rótulo técnico al pie, secciones de respaldo/camino/beneficios; diseño claro por decisión de marca */
+:root{
+  color-scheme:light;
+  --paper:#f6f8fc; --grid:#e3e9f3; --surface:#ffffff; --tint:#eef3fb;
+  --ink:#122e54; --muted:#5a6a85; --line:#d5deeb;
+  --blue:#1e4982; --yellow:#ffe500; --yellow-soft:#fff8c2; --ok:#2e7d4f; --warn:#b45309; --off:#8b96aa;
+  --f-logo:"Bangers","Impact",sans-serif;
+  --f-label:"Barlow Condensed","Arial Narrow",sans-serif;
+  --f-body:"Barlow",system-ui,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,monospace;
+  --blob:58% 42% 47% 53% / 44% 56% 44% 56%;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.55}
+a{color:var(--blue)}
+.wrap{max-width:1140px;margin:0 auto;padding-inline:16px}
+section.blk{padding-block:56px}
+.eyebrow{font:600 13px var(--f-label);letter-spacing:.14em;text-transform:uppercase;color:var(--blue)}
+h2.big{font-family:var(--f-logo);font-weight:400;font-size:clamp(34px,5vw,50px);line-height:1;letter-spacing:.02em;margin:6px 0 10px;text-wrap:balance}
+h2.big mark,h1 mark{background:var(--yellow);color:var(--ink);padding:0 .18em;border-radius:12px 6px 14px 8px}
+.lead{color:var(--muted);max-width:62ch;margin:0}
+
+/* header */
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:10;background:rgba(255,255,255,.94);backdrop-filter:blur(6px);border-bottom:1px solid var(--line)}
+.bar{max-width:1140px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.logo{font-family:var(--f-logo);font-size:28px;line-height:1;color:var(--blue);letter-spacing:.03em;background:none;border:0;cursor:pointer;padding:0}
+.logo em{font-style:normal;background:var(--yellow);color:var(--ink);padding:0 7px;border-radius:9px 5px 10px 6px;margin-left:5px}
+nav.links{display:flex;gap:4px;flex-wrap:wrap;margin-left:auto;align-items:center}
+nav.links a{font:600 15px var(--f-body);color:var(--ink);text-decoration:none;padding:7px 10px;border-radius:10px}
+nav.links a:hover{background:var(--tint)}
+.btn{font:700 15px var(--f-body);border:2px solid var(--blue);border-radius:999px;padding:9px 18px;cursor:pointer;background:var(--blue);color:#fff;text-decoration:none;display:inline-flex;align-items:center;gap:8px;line-height:1.2}
+.btn.y{background:var(--yellow);border-color:var(--yellow);color:var(--ink)}
+.btn.o{background:transparent;color:var(--blue)}
+.btn.sm{padding:6px 13px;font-size:14px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+:focus-visible{outline:3px solid var(--blue);outline-offset:3px}
+.memberchip{display:inline-flex;gap:8px;align-items:center;font:600 14px var(--f-body);background:var(--yellow);border-radius:999px;padding:6px 6px 6px 14px}
+.memberchip[hidden]{display:none}
+.memberchip button{font:600 13px var(--f-body);border:0;background:#fff;color:var(--ink);border-radius:999px;padding:4px 10px;cursor:pointer}
+.teaser{display:grid;grid-template-columns:1.3fr 1fr;gap:24px;align-items:center;background:var(--surface);border:2px solid var(--blue);border-radius:32px 22px 36px 24px;padding:28px}
+.teaser ul{margin:0;padding-left:18px;display:grid;gap:4px}
+@media (max-width:760px){.teaser{grid-template-columns:1fr}}
+.demo{background:var(--yellow-soft);color:var(--ink);font-size:13px;text-align:center;padding:6px 16px;border-bottom:1px solid #f1e48a}
+
+/* hero */
+.hero{position:relative;overflow:hidden;background:var(--surface);border-bottom:1px solid var(--line)}
+.reopen{border:2px solid var(--blue);border-radius:16px;padding:14px;display:grid;gap:8px;font-size:14px}
+.reopen select{width:auto}
+.reopen small{color:var(--muted)}
+#bg{position:absolute;inset:0;width:100%;height:100%;display:block;pointer-events:none}
+.hero .wrap[hidden]{display:none}
+.hero .wrap{position:relative;z-index:1;display:grid;grid-template-columns:1.25fr 1fr;gap:40px;align-items:center;padding-block:56px 64px}
+.hero h1{font-family:var(--f-logo);font-weight:400;font-size:clamp(48px,7.5vw,88px);line-height:.92;letter-spacing:.02em;margin:10px 0 16px;color:var(--blue);text-wrap:balance}
+.hero h1 span{display:block;color:var(--ink)}
+.hero p{font-size:18px;max-width:52ch;margin:0 0 22px;color:var(--muted)}
+.hero p b{color:var(--ink)}
+.ctas{display:flex;gap:10px;flex-wrap:wrap}
+.lema{margin-top:26px;font:600 13px var(--f-label);letter-spacing:.2em;color:var(--muted)}
+.how{position:relative;padding:28px 22px}
+.how::before{content:"";position:absolute;inset:0;background:var(--yellow);border-radius:var(--blob);transform:rotate(-4deg);animation:morph 14s ease-in-out infinite alternate}
+@keyframes morph{
+  0%{border-radius:58% 42% 47% 53% / 44% 56% 44% 56%;transform:rotate(-4deg) scale(1)}
+  33%{border-radius:42% 58% 62% 38% / 55% 40% 60% 45%;transform:rotate(3deg) scale(1.03)}
+  66%{border-radius:65% 35% 40% 60% / 38% 62% 38% 62%;transform:rotate(-7deg) scale(.98)}
+  100%{border-radius:48% 52% 55% 45% / 60% 45% 55% 40%;transform:rotate(1deg) scale(1.02)}}
+@media (prefers-reduced-motion:reduce){.how::before{animation:none}}
+.howcard{position:relative;background:var(--surface);border:2px solid var(--ink);border-radius:18px;overflow:hidden}
+.howcard header{position:static;background:var(--ink);color:#fff;border:0;padding:10px 16px;font:600 14px var(--f-label);letter-spacing:.12em;text-transform:uppercase;backdrop-filter:none}
+.step{display:grid;grid-template-columns:44px 1fr;gap:12px;padding:14px 16px;border-top:1px solid var(--line)}
+.step:first-of-type{border-top:0}
+.step i{font:400 30px var(--f-logo);color:var(--blue);font-style:normal;line-height:1}
+.step b{display:block;font-size:16px}
+.step span{font-size:14px;color:var(--muted)}
+
+/* board */
+.boardhead{display:flex;justify-content:space-between;align-items:end;gap:16px;flex-wrap:wrap;margin-bottom:18px}
+.filters{display:flex;gap:8px;flex-wrap:wrap;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:10px;margin-bottom:18px}
+.filters input[type=search],.filters select{font:inherit;padding:8px 12px;border-radius:12px;border:1px solid var(--line);background:var(--paper);color:var(--ink)}
+.filters input[type=search]{flex:1 1 220px}
+.tog{display:flex;gap:6px;align-items:center;font-size:14px;padding:8px 12px;border-radius:12px;border:1px solid var(--line);cursor:pointer;background:var(--paper)}
+.tog input{accent-color:var(--blue)}
+.activetag{font-size:14px;color:var(--muted)}
+.activetag button{font:inherit;border:0;background:var(--yellow);color:var(--ink);border-radius:999px;padding:2px 10px;cursor:pointer}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:16px}
+.card{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:20px;display:flex;flex-direction:column;cursor:pointer;min-width:0;overflow:hidden;transition:transform .15s,border-color .15s}
+.card:hover{transform:translateY(-2px);border-color:var(--blue)}
+.cbody{padding:16px 16px 12px;display:flex;flex-direction:column;gap:10px;flex:1}
+.stamp{position:absolute;top:14px;right:12px;font:700 12px var(--f-label);letter-spacing:.16em;color:var(--blue);border:2px solid var(--blue);border-radius:6px;padding:1px 7px;transform:rotate(6deg);background:var(--surface);opacity:.85}
+.meta{display:flex;gap:6px;flex-wrap:wrap;align-items:center;font-size:13px;color:var(--muted)}
+.pill{font:600 12px var(--f-body);padding:3px 9px;border-radius:999px;background:var(--tint);color:var(--ink);white-space:nowrap}
+.pill.first{background:var(--yellow);color:var(--ink)}
+.pill.open{background:#e6f3ec;color:var(--ok)}
+.pill.full{background:#eef0f4;color:var(--off)}
+.pill.pm{background:var(--blue);color:#fff}
+.pill.none{background:#fdf0e3;color:var(--warn)}
+.card h3{font:700 21px/1.15 var(--f-body);margin:0;padding-right:64px;text-wrap:balance}
+.card p{margin:0;color:var(--muted);font-size:15px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.specs{display:flex;gap:6px;flex-wrap:wrap;font:500 12px var(--f-mono)}
+.specs span{border:1px dashed #b9c6da;border-radius:7px;padding:2px 7px;background:var(--paper)}
+.tags{display:flex;gap:6px;flex-wrap:wrap}
+.tag{font:500 13px var(--f-body);color:var(--blue);background:transparent;border:0;padding:0;cursor:pointer}
+.tag:hover{text-decoration:underline}
+.rotulo{display:grid;grid-template-columns:1fr 1fr 1.1fr;border-top:2px solid var(--ink);font-variant-numeric:tabular-nums}
+.rotulo div{padding:7px 10px;border-right:1px solid var(--line);min-width:0}
+.rotulo div:last-child{border-right:0}
+.rotulo small{display:block;font:600 10px var(--f-label);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.rotulo b{font:500 13px var(--f-mono);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
+.cupo{display:flex;gap:3px;margin-top:4px}
+.cupo i{height:5px;flex:1;border-radius:3px;background:var(--grid)}
+.cupo i.on{background:var(--blue)}
+.empty{padding:36px;text-align:center;color:var(--muted);background:var(--surface);border-radius:20px;border:2px dashed var(--line)}
+
+/* respaldo */
+.respaldo{background:var(--blue);color:#fff;border-radius:36px 28px 40px 24px;padding:44px 28px;position:relative;overflow:hidden}
+.respaldo .eyebrow{color:var(--yellow)}
+.respaldo .lead{color:#d6e1f3}
+.respaldo h2.big mark{color:var(--ink)}
+.rgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin-top:26px}
+.ritem{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);border-radius:18px;padding:16px;display:grid;gap:6px;align-content:start}
+.ritem svg{width:30px;height:30px;stroke:var(--yellow);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.ritem b{font-size:17px}
+.ritem span{font-size:14px;color:#d6e1f3}
+.quote{margin-top:24px;display:flex;gap:14px;align-items:center;flex-wrap:wrap;background:var(--yellow);color:var(--ink);border-radius:18px 12px 20px 14px;padding:14px 18px;font-size:16px}
+.quote b{font-family:var(--f-logo);font-weight:400;font-size:24px;letter-spacing:.03em}
+
+/* camino */
+.path{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin-top:26px;position:relative}
+.lvl{padding:18px 16px 18px 0;position:relative;display:grid;gap:6px;align-content:start}
+.lvl::before{content:"";position:absolute;top:30px;left:44px;right:0;height:2px;background:repeating-linear-gradient(90deg,var(--blue) 0 8px,transparent 8px 14px)}
+.lvl:last-child::before{display:none}
+.lvl .n{width:48px;height:48px;border-radius:var(--blob);background:var(--yellow);font:400 26px/48px var(--f-logo);text-align:center;color:var(--ink);position:relative}
+.lvl:last-child .n{background:var(--blue);color:#fff}
+.lvl b{font-size:18px}
+.lvl span{font-size:14px;color:var(--muted)}
+.lvl ul{margin:4px 0 0;padding-left:18px;font-size:14px}
+
+/* beneficios */
+.pgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px;margin-top:26px}
+.prod{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:18px;display:grid;gap:8px;align-content:start;position:relative}
+.prod .unit{font:600 12px var(--f-label);letter-spacing:.14em;color:var(--blue)}
+.prod b{font-size:18px;line-height:1.2}
+.prod span{font-size:14px;color:var(--muted)}
+.off{justify-self:start;font:400 24px var(--f-logo);letter-spacing:.03em;background:var(--yellow);padding:2px 12px;border-radius:12px 6px 14px 8px}
+.off small{font:600 12px var(--f-body);letter-spacing:0;margin-left:4px}
+.fine{font-size:13px;color:var(--muted);margin-top:14px}
+
+/* quien */
+.who{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px;margin-top:22px}
+.who div{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:18px}
+.who h3{font:700 13px var(--f-label);letter-spacing:.14em;text-transform:uppercase;margin:0 0 8px}
+.who .y h3{color:var(--ok)} .who .n2 h3{color:var(--warn)}
+.who ul{margin:0;padding-left:18px;font-size:15px}
+.who li{margin-bottom:4px}
+
+/* forms */
+.view[hidden],section[hidden]{display:none!important}
+.formwrap{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:22px;align-items:start;padding-block:36px 64px}
+.formbox{background:var(--surface);border:1px solid var(--line);border-radius:24px;padding:22px;display:grid;gap:22px;min-width:0}
+.formbox h1{font-family:var(--f-logo);font-weight:400;font-size:42px;letter-spacing:.02em;line-height:1;margin:0;color:var(--blue)}
+fieldset{border:0;padding:0;margin:0;display:grid;gap:12px;min-width:0}
+legend{font:700 14px var(--f-label);letter-spacing:.14em;text-transform:uppercase;color:var(--ink);margin-bottom:8px;display:flex;gap:8px;align-items:center}
+legend i{font:400 18px var(--f-logo);font-style:normal;background:var(--yellow);border-radius:var(--blob);width:28px;height:28px;display:inline-grid;place-items:center;letter-spacing:0}
+.row{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px}
+label.f{display:grid;gap:4px;font-size:14px;font-weight:600;min-width:0}
+label.f small{font-weight:400;color:var(--muted)}
+input,select,textarea{font:inherit;font-weight:400;padding:9px 12px;border-radius:12px;border:1px solid var(--line);background:var(--paper);color:var(--ink);width:100%}
+input:focus,select:focus,textarea:focus{border-color:var(--blue);background:#fff}
+textarea{min-height:110px;resize:vertical}
+.choice{display:flex;gap:8px;flex-wrap:wrap}
+.choice label{display:flex;gap:7px;align-items:center;border:1px solid var(--line);border-radius:12px;padding:9px 13px;cursor:pointer;font-size:14px;background:var(--paper)}
+.choice label:has(input:checked){border-color:var(--blue);background:var(--tint);font-weight:600}
+.choice input,.check input{width:auto;accent-color:var(--blue)}
+.chipin{display:flex;flex-wrap:wrap;gap:6px;align-items:center;border:1px solid var(--line);border-radius:12px;padding:6px;background:var(--paper)}
+.chipin input{border:0;flex:1 1 140px;padding:4px 6px;background:transparent}
+.chip{background:var(--yellow);border-radius:999px;padding:2px 4px 2px 10px;font-size:13px;display:flex;gap:2px;align-items:center}
+.chip button{border:0;background:transparent;cursor:pointer;color:inherit;font-size:13px}
+.suggest{display:flex;gap:8px;flex-wrap:wrap;font-size:13px;color:var(--muted);align-items:center}
+.suggest .tag{font-size:13px}
+.note{font-size:14px;color:var(--ink);background:var(--tint);border-radius:14px;padding:11px 14px}
+.check{display:flex;gap:10px;align-items:flex-start;font-size:14px}
+.check input{margin-top:4px}
+.aside{display:grid;gap:12px;position:sticky;top:90px}
+.asidecard{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:16px;display:grid;gap:6px;font-size:14px}
+.asidecard.y{background:var(--yellow);border-color:var(--yellow)}
+.asidecard b{font-size:16px}
+.asidecard ul{margin:0;padding-left:18px}
+.welcome{background:var(--surface);border:2px solid var(--blue);border-radius:24px;padding:22px;display:grid;gap:14px}
+.welcome h2{font-family:var(--f-logo);font-weight:400;font-size:38px;margin:0;color:var(--blue);letter-spacing:.02em}
+.coupon{display:flex;gap:12px;align-items:center;flex-wrap:wrap;border:2px dashed var(--ink);border-radius:16px;padding:12px 16px;background:var(--yellow-soft)}
+.coupon code{font:500 22px var(--f-mono);letter-spacing:.08em}
+.todo{display:grid;gap:8px;margin:0;padding:0;list-style:none}
+.todo li{display:flex;gap:10px;align-items:flex-start;font-size:15px}
+.todo li::before{content:"";flex:none;width:18px;height:18px;margin-top:3px;border:2px solid var(--blue);border-radius:6px}
+
+/* dialog */
+dialog{border:0;border-radius:24px;padding:0;max-width:800px;width:calc(100% - 24px);background:var(--surface);color:var(--ink);max-height:92vh}
+dialog::backdrop{background:rgba(18,46,84,.5)}
+.dl{padding:22px;display:grid;gap:18px}
+.dlhead{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+.dl h2{font:700 28px/1.1 var(--f-body);margin:0;text-wrap:balance}
+.dl h4{font:700 13px var(--f-label);letter-spacing:.14em;text-transform:uppercase;color:var(--blue);margin:0 0 8px}
+.x{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;width:38px;height:38px;cursor:pointer;font-size:16px;flex:none}
+.sheet{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border:2px solid var(--ink);border-radius:12px;overflow:hidden}
+.sheet div{padding:8px 12px;border-right:1px solid var(--line);border-bottom:1px solid var(--line)}
+.sheet div:nth-child(3n){border-right:0}
+.sheet div:nth-last-child(-n+3){border-bottom:0}
+.sheet small{display:block;font:600 10px var(--f-label);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.sheet b{font:500 14px var(--f-mono)}
+.qa{display:grid;gap:10px}
+.q{border-left:3px solid var(--yellow);padding-left:12px;font-size:15px}
+.q .a{margin-top:3px;color:var(--muted)}
+.q .a b{color:var(--ink)}
+.inline{display:flex;gap:8px;flex-wrap:wrap}
+.inline input{flex:1 1 220px;width:auto}
+.prop{border:1px solid var(--line);border-radius:16px;padding:14px;display:grid;gap:8px;position:relative;background:var(--paper)}
+.prop.pmp{border:2px solid var(--blue);background:var(--surface)}
+.prop .who2{display:flex;gap:10px;align-items:center}
+.av{width:38px;height:38px;border-radius:var(--blob);background:var(--yellow);display:grid;place-items:center;font:400 18px var(--f-logo);flex:none}
+.prop.pmp .av{background:var(--blue);color:#fff}
+.prop .who2 small{display:block;color:var(--muted);font-size:13px}
+.prop pre{margin:0;white-space:pre-wrap;font:inherit;font-size:14px}
+.prop .stamp{top:12px}
+.propnums{display:flex;gap:6px;flex-wrap:wrap;font:500 12px var(--f-mono)}
+.propnums span{background:var(--surface);border:1px solid var(--line);border-radius:7px;padding:2px 8px}
+.pill.done{background:var(--ink);color:#fff}
+.rep{display:inline-flex;gap:6px;align-items:center;font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.rep b{color:var(--ink)}
+.rep .st{color:#d4b400;letter-spacing:1px}
+.rategrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
+.ratebox{border:1px solid var(--line);border-radius:16px;padding:14px;display:grid;gap:10px;background:var(--paper)}
+.ratebox h5{margin:0;font:700 15px var(--f-body)}
+.ratebox small{color:var(--muted)}
+.crit{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:14px;flex-wrap:wrap}
+.stars{display:flex;gap:2px}
+.stars button{border:0;background:transparent;font-size:22px;line-height:1;cursor:pointer;color:var(--line);padding:0 1px}
+.stars button.on{color:#e0c000}
+.yn{display:flex;gap:6px}
+.yn button{font:600 13px var(--f-body);border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:4px 12px;cursor:pointer}
+.yn button.on{background:var(--blue);border-color:var(--blue);color:#fff}
+.sent{font-size:14px;color:var(--ok);font-weight:600}
+.result{display:flex;gap:14px;flex-wrap:wrap;align-items:baseline}
+.result .big2{font:400 30px var(--f-logo);letter-spacing:.03em}
+.kit{margin-top:26px;background:var(--surface);border:1px solid var(--line);border-radius:24px;padding:20px;display:grid;gap:16px}
+.kithead{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
+.kithead h3{font:700 13px var(--f-label);letter-spacing:.14em;text-transform:uppercase;color:var(--blue);margin:0}
+.kithead span{font-size:13px;color:var(--muted)}
+.manuals{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:10px}
+.man{display:grid;grid-template-columns:40px 1fr;gap:10px;padding:14px;border:1px solid var(--line);border-radius:16px;background:var(--paper)}
+.man i{font:400 26px/40px var(--f-logo);font-style:normal;width:40px;height:40px;text-align:center;background:var(--yellow);border-radius:var(--blob)}
+.man b{display:block;font-size:16px;margin-bottom:2px}
+.man span{font-size:14px;color:var(--muted);display:block}
+.man .mt{margin-top:8px;font:500 12px var(--f-mono);color:var(--blue)}
+.tpls{display:flex;gap:6px;flex-wrap:wrap;align-items:center;font-size:14px}
+.tpls b{margin-right:4px}
+.kit2{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px;margin-top:16px}
+.calc,.call{background:var(--surface);border:1px solid var(--line);border-radius:24px;padding:20px;display:grid;gap:14px;align-content:start;min-width:0}
+.calcout{display:flex;justify-content:space-between;align-items:center;gap:10px;background:var(--yellow);border-radius:16px 10px 18px 12px;padding:12px 16px}
+.calcout b{font:400 32px var(--f-logo);letter-spacing:.03em;font-variant-numeric:tabular-nums}
+.calcres{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border:2px solid var(--ink);border-radius:12px;overflow:hidden}
+.calcres div{padding:8px 12px;border-right:1px solid var(--line)}
+.calcres div:last-child{border-right:0}
+.calcres small{display:block;font:600 10px var(--f-label);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.calcres b{font:500 15px var(--f-mono);font-variant-numeric:tabular-nums}
+.days{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px}
+.day{flex:none;border:1px solid var(--line);border-radius:14px;padding:8px 12px;background:var(--paper);cursor:pointer;font:600 14px var(--f-body);color:var(--ink);text-align:center;min-width:76px}
+.day small{display:block;font-weight:400;color:var(--muted);font-size:12px}
+.day.on{background:var(--blue);border-color:var(--blue);color:#fff}
+.day.on small{color:#d6e1f3}
+.slots{display:flex;gap:8px;flex-wrap:wrap}
+.slot{font:500 14px var(--f-mono);border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:10px;padding:7px 12px;cursor:pointer}
+.slot.on{background:var(--yellow);border-color:var(--yellow)}
+.slot:disabled{text-decoration:line-through;color:var(--off);cursor:not-allowed;background:var(--paper)}
+.booked{border:2px solid var(--blue);border-radius:16px;padding:14px;display:grid;gap:6px}
+.booked b{font-size:17px}
+@media (max-width:520px){.calcres{grid-template-columns:1fr}.calcres div{border-right:0;border-bottom:1px solid var(--line)}}
+.manst{display:inline-block;margin-top:8px;margin-left:8px;font:600 12px var(--f-body);padding:2px 9px;border-radius:999px;background:var(--grid);color:var(--muted)}
+.manst.ready{background:var(--blue);color:#fff}
+.man{cursor:pointer;transition:border-color .15s}
+.man:hover{border-color:var(--blue)}
+.reader{max-width:68ch;font-size:16px;line-height:1.65}
+.reader .lede{font-size:18px;color:var(--ink)}
+.reader h3{font:700 14px var(--f-label);letter-spacing:.14em;text-transform:uppercase;color:var(--blue);margin:26px 0 8px}
+.reader p{margin:0 0 10px}
+.reader ul,.reader ol{margin:0 0 10px;padding-left:20px}
+.reader li{margin-bottom:6px}
+.reader .formula{font:500 15px var(--f-mono);background:var(--yellow-soft);border:2px dashed var(--ink);border-radius:12px;padding:12px 14px;margin:0 0 12px}
+.reader .ex{background:var(--tint);border-radius:12px;padding:10px 14px}
+.reader .tbl{overflow-x:auto;margin:0 0 12px}
+.reader table{border-collapse:collapse;width:100%;font-size:14px}
+.reader th,.reader td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+.reader th{background:var(--tint);font:700 12px var(--f-label);letter-spacing:.1em;text-transform:uppercase}
+.reader table.num td:last-child{text-align:right;font-family:var(--f-mono);width:80px}
+.reader tr.tot td{font-weight:700;border-top:2px solid var(--ink)}
+.reader .vs{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px;margin-bottom:10px}
+.reader .vs>div{border-radius:14px;padding:12px 14px;font-size:14px;display:grid;gap:6px}
+.reader .bad{background:#fdf0e3;border:1px solid #f1c79a}
+.reader .good{background:#e6f3ec;border:1px solid #a9d6bb}
+.reader .vs p{margin:0}
+.reader .vs small{color:var(--muted)}
+.reader .tagx{font:700 11px var(--f-label);letter-spacing:.14em;text-transform:uppercase}
+.reader .errs li::marker{content:"✕  ";color:var(--warn)}
+.reader .check2 li::marker{content:"✓  ";color:var(--ok)}
+.btn.wa{background:#1f8f4e;border-color:#1f8f4e;color:#fff}
+.linkbtn{font:inherit;font-size:13px;border:0;background:none;color:var(--muted);text-decoration:underline;cursor:pointer;padding:0}
+.panel{display:grid;grid-template-columns:300px minmax(0,1fr);gap:16px;align-items:start}
+.plist{display:grid;gap:8px}
+.prow{display:grid;gap:4px;text-align:left;font:inherit;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:12px;cursor:pointer;color:var(--ink);justify-items:start}
+.prow span:not(.pill){font-size:13px;color:var(--muted)}
+.prow.on{border:2px solid var(--blue)}
+.pdetail{background:var(--surface);border:1px solid var(--line);border-radius:24px;padding:20px;display:grid;gap:14px;min-width:0}
+.ptitle{font:700 20px/1.2 var(--f-body);margin:0}
+.ptext{white-space:pre-wrap;font:inherit;font-size:15px;background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:14px;margin:0}
+.h4b{font:700 13px var(--f-label);letter-spacing:.14em;text-transform:uppercase;color:var(--blue);margin:0 0 8px}
+.notas{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.nota{display:flex;gap:10px;align-items:flex-start;font-size:14px;background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:8px 10px}
+.nota>span:nth-child(2){flex:1}
+.x.sm{width:28px;height:28px;font-size:12px}
+.nt{flex:none;font:700 11px var(--f-label);letter-spacing:.1em;text-transform:uppercase;border-radius:6px;padding:2px 7px}
+.nt-corregir{background:#fdf0e3;color:var(--warn)}
+.nt-agregar{background:#e6f3ec;color:var(--ok)}
+.nt-sacar{background:#fbe7e7;color:#b42318}
+.quick{display:grid;gap:6px}
+.qbtn{display:flex;gap:8px;align-items:flex-start;text-align:left;font:inherit;font-size:14px;border:1px dashed var(--line);background:var(--surface);color:var(--ink);border-radius:12px;padding:8px 10px;cursor:pointer}
+.qbtn:hover{border-color:var(--blue)}
+.mislist{display:grid;gap:12px}
+.mis{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:18px;display:grid;gap:12px}
+@media (max-width:860px){.panel{grid-template-columns:1fr}}
+.offs{display:flex;gap:6px;flex-wrap:wrap}
+.prod .btn.wa{justify-self:start;margin-top:4px}
+.prod.pro-only[hidden]{display:none}
+.fbdlg{max-width:560px}
+.bigstars{display:flex;gap:6px}
+.bigstars button{border:0;background:transparent;font-size:40px;line-height:1;color:var(--line);cursor:pointer;padding:0;transition:transform .1s}
+.bigstars button:hover{transform:scale(1.12)}
+.bigstars button.on{color:#e0c000}
+.sugs{display:flex;gap:6px;flex-wrap:wrap}
+.sug{font:500 14px var(--f-body);border:1px solid var(--line);background:var(--paper);color:var(--ink);border-radius:999px;padding:6px 12px;cursor:pointer}
+.sug.on{background:var(--yellow);border-color:var(--yellow);font-weight:600}
+.opin{background:var(--surface);border:1px solid var(--line);border-radius:24px;padding:20px;display:grid;gap:12px}
+.oplist{display:grid;gap:8px}
+.opi{display:grid;gap:2px;font-size:14px;border-bottom:1px solid var(--line);padding-bottom:8px}
+.toptags{display:flex;gap:6px;flex-wrap:wrap;align-items:center;font-size:14px}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 18px;border-radius:999px;font-weight:600;font-size:14px;z-index:30;box-shadow:0 6px 20px rgba(18,46,84,.25)}
+footer{border-top:1px solid var(--line);background:var(--surface);padding-block:22px;font-size:14px;color:var(--muted)}
+footer .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+
+@media (max-width:860px){
+  .hero .wrap,.formwrap{grid-template-columns:1fr}
+  .aside{position:static}
+  .path{grid-template-columns:1fr 1fr;gap:6px}
+  .lvl::before{display:none}
+  nav.links{margin-left:0}
+}
+@media (max-width:520px){
+  .path{grid-template-columns:1fr}
+  .sheet{grid-template-columns:1fr 1fr}
+  .sheet div{border-right:1px solid var(--line)!important;border-bottom:1px solid var(--line)!important}
+  .rotulo{grid-template-columns:1fr 1fr}
+  .rotulo div:last-child{grid-column:1/-1;border-top:1px solid var(--line)}
+  .respaldo{padding:32px 18px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+
+
+<header>
+  <div class="bar">
+    <button class="logo" id="home" aria-label="Ir al inicio">PROYECTA MÁS<em>RED</em></button>
+    <nav class="links" aria-label="Secciones">
+      <a href="#proyectos" data-go="inicio">Proyectos</a>
+      <a href="#respaldo" data-go="inicio" class="pro-only" hidden>Respaldo</a>
+      <a href="#primer-cliente" data-go="inicio" class="pro-only" hidden>Primer cliente</a>
+      <button class="btn o sm pro-only" data-view="mis" hidden>Mis propuestas</button>
+      <a href="#camino" data-go="inicio" class="pro-only" hidden>Camino</a>
+      <a href="#beneficios" data-go="inicio">Herramientas</a>
+      <button class="btn o sm" data-view="publicar">Publicar proyecto</button>
+      <button class="btn sm pub-only" data-view="registro">Sumarme</button>
+      <button class="btn o sm pub-only" id="login">Ingresar como profesional</button>
+      <span class="pro-only memberchip" hidden><span id="mname">Profesional</span> · Nivel 1 <button type="button" id="logout">Salir</button></span>
+    </nav>
+  </div>
+  <div class="demo">Vista de prueba · Los proyectos, propuestas, descuentos y nombres marcados como <b>EJEMPLO</b> son ilustrativos.</div>
+</header>
+
+<main>
+<div class="view" id="v-inicio">
+
+  <section class="hero">
+    <canvas id="bg" aria-hidden="true"></canvas>
+    <div class="wrap pub-only">
+      <div>
+        <div class="eyebrow">Arquitectura · Ingeniería · Obra · Argentina</div>
+        <h1>Publicá tu proyecto. <span>Recibí propuestas.</span></h1>
+        <p>Contá qué necesitás (un anteproyecto, planos de instalación, renders o un cómputo) con las medidas de tu terreno. Profesionales independientes de todo el país te hacen preguntas, te envían propuestas y arreglan el trabajo <b>directo con vos, gratis y sin comisiones</b>.</p>
+        <div class="ctas">
+          <button class="btn y" data-view="publicar">Publicar mi proyecto</button>
+          <button class="btn o" data-view="registro">Soy profesional</button>
+        </div>
+        <div class="lema">PROYECTAR · MODELAR · CONSTRUIR · DESARROLLAR</div>
+      </div>
+      <div class="how">
+        <div class="howcard">
+          <header>Cómo funciona</header>
+          <div class="step"><i>1</i><div><b>Publicás tu proyecto</b><span>Con medidas, etiquetas, plazo y cuántas propuestas querés recibir.</span></div></div>
+          <div class="step"><i>2</i><div><b>Respondés preguntas</b><span>Los profesionales te consultan lo que les falta saber. Las respuestas quedan a la vista de todos.</span></div></div>
+          <div class="step"><i>3</i><div><b>Comparás propuestas</b><span>Precio, plazo, entregables y portfolio de cada profesional, lado a lado.</span></div></div>
+          <div class="step"><i>4</i><div><b>Arreglan directo</b><span>Elegís una propuesta y se comparten los contactos. El pago lo acuerdan entre ustedes.</span></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="wrap pro-only" hidden>
+      <div>
+        <div class="eyebrow">Red de profesionales independientes · Argentina</div>
+        <h1>Lanzate solo. <span>No estás solo.</span></h1>
+        <p>Particulares, estudios y empresas publican lo que necesitan. Vos preguntás, proponés y arreglás el trabajo <b>directo con el cliente, sin comisiones</b>. Y Proyecta Más te respalda en tus primeros proyectos para que te animes a trabajar por tu cuenta.</p>
+        <div class="ctas">
+          <button class="btn y" data-view="registro">Soy profesional, quiero sumarme</button>
+          <button class="btn o" data-view="publicar">Necesito un profesional</button>
+        </div>
+        <div class="lema">PROYECTAR · MODELAR · CONSTRUIR · DESARROLLAR</div>
+      </div>
+      <div class="how">
+        <div class="howcard">
+          <header>Cómo funciona</header>
+          <div class="step"><i>1</i><div><b>Publican el proyecto</b><span>Con medidas, etiquetas, plazo y cuántas propuestas quieren recibir.</span></div></div>
+          <div class="step"><i>2</i><div><b>Preguntás y proponés</b><span>Las preguntas quedan públicas. Tu propuesta la puede revisar Proyecta Más antes de enviarla.</span></div></div>
+          <div class="step"><i>3</i><div><b>Arreglan directo</b><span>Si aceptan tu propuesta, se comparten los contactos. Precio y pago entre ustedes.</span></div></div>
+          <div class="step"><i>4</i><div><b>Sumás reseña y nivel</b><span>Cada proyecto entregado te acerca a Aliado Proyecta Más.</span></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="blk" id="proyectos">
+    <div class="wrap">
+      <div class="boardhead">
+        <div>
+          <div class="eyebrow">Tablero</div>
+          <h2 class="big">Proyectos <mark>abiertos</mark></h2>
+          <p class="lead">Arquitectura, ingeniería, instalaciones, 3D y cómputo de todo el país. Tocá un proyecto para ver la ficha completa, las preguntas y ejemplos de propuestas.</p>
+        </div>
+        <button class="btn" data-view="publicar">Publicar proyecto</button>
+      </div>
+      <div class="filters">
+        <input type="search" id="q" placeholder="Buscar: anteproyecto, render, eléctrico, Revit…" aria-label="Buscar proyectos">
+        <select id="f-rubro" aria-label="Rubro"><option value="">Todos los rubros</option></select>
+        <select id="f-prov" aria-label="Provincia"><option value="">Todo el país</option></select>
+        <select id="f-cupo" aria-label="Cupos"><option value="">Todos los cupos</option><option value="libre">Con cupo libre</option><option value="completo">Cupo completo</option></select>
+        <span class="activetag" id="activetag"></span>
+      </div>
+      <div class="grid" id="grid"></div>
+    </div>
+  </section>
+
+  <section class="blk pro-only" id="respaldo" style="padding-top:8px" hidden>
+    <div class="wrap">
+      <div class="respaldo">
+        <div class="eyebrow">Respaldo Proyecta Más</div>
+        <h2 class="big">Tu primer cliente <mark>no lo enfrentás solo</mark></h2>
+        <p class="lead">Lo que más frena a un recién recibido no es saber dibujar. Es no saber cuánto cobrar, cómo armar una propuesta o qué hacer si algo sale mal. Para eso está el respaldo.</p>
+        <div class="rgrid">
+          <div class="ritem"><svg viewBox="0 0 24 24"><path d="M4 4h12l4 4v12H4z"/><path d="M8 12l3 3 5-6"/></svg><b>Revisión de tu propuesta</b><span>En tus primeras 3 propuestas, Proyecta Más las lee y te devuelve correcciones antes de enviarlas.</span></div>
+          <div class="ritem"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 7v10M9.5 9.5c0-1.2 1.1-2 2.5-2s2.5.8 2.5 2-1.1 1.8-2.5 2.2-2.5 1-2.5 2.3 1.1 2 2.5 2 2.5-.8 2.5-2"/></svg><b>Guía de honorarios</b><span>Cómo cotizar por hora, por m² o por entregable, cuántas revisiones incluir y cómo pedir anticipo.</span></div>
+          <div class="ritem"><svg viewBox="0 0 24 24"><path d="M6 3h9l3 3v15H6z"/><path d="M9 9h6M9 13h6M9 17h3"/></svg><b>Plantillas listas</b><span>Propuesta, presupuesto, acuerdo de trabajo simple y recibo. Las completás y las mandás.</span></div>
+          <div class="ritem"><svg viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z"/><path d="M8 9h8M8 12h5"/></svg><b>Consultas técnicas</b><span>Comunidad abierta para preguntar dudas de cálculo, normativa o software a colegas con más recorrido.</span></div>
+          <div class="ritem"><svg viewBox="0 0 24 24"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg><b>Llamada de 30 minutos</b><span>Cuando ganás tu primer proyecto, agendás una llamada para destrabar lo que necesites. Turnos fijos, sin esperas.</span></div>
+          <div class="ritem"><svg viewBox="0 0 24 24"><path d="M4 12h12M12 6l6 6-6 6"/><path d="M20 4v16"/></svg><b>Trabajo derivado</b><span>Proyectos que llegan a Proyecta Más y no toma el Estudio se derivan a profesionales de la Red.</span></div>
+        </div>
+        <div class="quote"><b>Proyecta Más también propone.</b><span>Si un proyecto pasa 5 días sin propuestas, Proyecta Más envía una, marcada aparte, para que nadie quede sin respuesta.</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="blk pro-only" id="primer-cliente" style="padding-top:8px" hidden>
+    <div class="wrap">
+      <div class="eyebrow">Kit Primer Cliente</div>
+      <h2 class="big">Tu primer cliente, <mark>paso a paso</mark></h2>
+      <p class="lead">Manuales y plantillas para resolver solo lo que más traba al arrancar: cuánto cobrar, cómo proponer, cómo acordar y cómo entregar. Si después de leerlos te queda una duda, agendás una llamada.</p>
+
+      <div class="kit">
+        <div class="kithead"><h3>Manuales</h3><span>Orden sugerido de lectura</span></div>
+        <div class="manuals">
+          <article class="man"><i>1</i><div><b>Portfolio sin experiencia</b><span>Cómo mostrar trabajos de facultad o un proyecto propio bien presentado. Qué láminas elegir, cómo contarlas y dónde publicarlas.</span><div class="mt">Guía PDF</div></div></article>
+          <article class="man"><i>2</i><div><b>La propuesta que gana</b><span>Estructura en 6 partes, una propuesta buena y una mala comparadas, y los 10 errores que hacen que te descarten.</span><div class="mt">Guía PDF · plantilla editable</div></div></article>
+          <article class="man"><i>3</i><div><b>Cuánto cobrar</b><span>Cotizar por hora, por m² o por entregable. Cómo calcular tu valor hora real, qué incluir y cómo cobrar los adicionales.</span><div class="mt">Guía PDF · calculadora abajo</div></div></article>
+          <article class="man"><i>4</i><div><b>El acuerdo de trabajo</b><span>Alcance, entregables, rondas de revisión, plazos, forma de pago y a quién pertenecen los archivos. Una carilla que evita discusiones.</span><div class="mt">Plantilla Word</div></div></article>
+          <article class="man"><i>5</i><div><b>Del primer mensaje a la entrega</b><span>Checklist por etapa: primera reunión, relevamiento, entrega parcial, ajustes, entrega final y pedido de calificación.</span><div class="mt">Checklist PDF</div></div></article>
+          <article class="man"><i>6</i><div><b>Entregables profesionales</b><span>Rótulo, láminas, escalas, capas, nombres de archivo y armado del PDF + DWG para que el cliente vea un trabajo prolijo.</span><div class="mt">Guía PDF · rótulo DWG</div></div></article>
+          <article class="man"><i>7</i><div><b>Cuando el cliente se estira</b><span>“Un cambio más”, pedidos fuera de alcance, demoras en el pago. Qué decir, qué cobrar y cuándo cortar.</span><div class="mt">Guía PDF · mensajes modelo</div></div></article>
+          <article class="man"><i>8</i><div><b>Facturar sin miedo</b><span>Monotributo para arrancar: qué es, cómo emitir tu primera factura electrónica y qué consultar con un contador.</span><div class="mt">Guía PDF</div></div></article>
+          <article class="man"><i>9</i><div><b>Incumbencias</b><span>Qué te habilita a hacer y a firmar tu título, la diferencia entre hacer y firmar, y cómo sumar a un colega cuando el trabajo te excede.</span><div class="mt">Guía PDF</div></div></article>
+          <article class="man"><i>10</i><div><b>Matricularte en el colegio</b><span>Colegio de Arquitectos o de técnicos y MMO: requisitos, pasos, caja previsional, visado y qué preguntar antes de inscribirte.</span><div class="mt">Guía PDF · checklist</div></div></article>
+        </div>
+        <div class="tpls"><b>Plantillas sueltas</b><span class="pill">Propuesta</span><span class="pill">Presupuesto</span><span class="pill">Acuerdo de trabajo</span><span class="pill">Recibo</span><span class="pill">Checklist de entrega</span><span class="pill">Rótulo DWG</span><span class="pill">Pedido de calificación</span></div>
+      </div>
+
+      <div class="kit2">
+        <div class="calc" id="calc">
+          <div class="kithead"><h3>Calculadora de valor hora</h3><span>Valores de ejemplo, cambialos por los tuyos</span></div>
+          <div class="row">
+            <label class="f">Gastos fijos por mes <small>Software, internet, monotributo, equipo</small><input id="c-gastos" inputmode="numeric" value="350000"></label>
+            <label class="f">Lo que querés ganar por mes <small>Neto, para vos</small><input id="c-neto" inputmode="numeric" value="1200000"></label>
+            <label class="f">Horas que facturás por mes <small>No todas las que trabajás</small><input id="c-horas" inputmode="numeric" value="100"></label>
+          </div>
+          <div class="calcout"><span>Tu valor hora</span><b id="c-vh">—</b></div>
+          <div class="row">
+            <label class="f">Horas estimadas del trabajo<input id="c-ht" inputmode="numeric" value="40"></label>
+            <label class="f">Margen por imprevistos y revisiones<select id="c-margen"><option value="0.1">10%</option><option value="0.2" selected>20%</option><option value="0.3">30%</option></select></label>
+          </div>
+          <div class="calcres">
+            <div><small>Precio sugerido</small><b id="c-precio">—</b></div>
+            <div><small>Anticipo 30%</small><b id="c-ant">—</b></div>
+            <div><small>Contra entrega</small><b id="c-saldo">—</b></div>
+          </div>
+          <p class="fine" style="margin:0">Facturar 100 horas en un mes de 160 es normal: el resto se va en buscar clientes, reuniones y administración.</p>
+        </div>
+
+        <div class="call" id="call">
+          <div class="kithead"><h3>Agendá una llamada</h3><span>30 minutos · por Google Meet</span></div>
+          <p style="margin:0;font-size:14px;color:var(--muted)">La primera llamada es sin cargo cuando ganás tu primer proyecto. Más adelante vas a poder reservar asesoramientos adicionales.</p>
+          <div id="callbody"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="blk pro-only" id="camino" style="padding-top:8px" hidden>
+    <div class="wrap">
+      <div class="eyebrow">Camino del profesional</div>
+      <h2 class="big">De recién recibido a <mark>independiente</mark></h2>
+      <p class="lead">Cada nivel suma beneficios. El último te convierte en aliado: trabajás en proyectos de Proyecta Más y de otros colegas de la Red.</p>
+      <div class="path">
+        <div class="lvl"><div class="n">1</div><b>Registrado</b><span>Creaste tu perfil.</span><ul><li>Acceso al tablero y a las plantillas</li><li>Beneficios en productos Proyecta Más</li></ul></div>
+        <div class="lvl"><div class="n">2</div><b>Primer proyecto</b><span>Te aceptaron una propuesta.</span><ul><li>Revisión de propuestas</li><li>Insignia en tu perfil</li></ul></div>
+        <div class="lvl"><div class="n">3</div><b>Independiente</b><span>3 proyectos con reseña.</span><ul><li>Perfil destacado en búsquedas</li><li>Acceso anticipado a nuevas planillas y cursos</li></ul></div>
+        <div class="lvl"><div class="n">4</div><b>Aliado Proyecta Más</b><span>Por invitación.</span><ul><li>Recibís trabajo derivado</li><li>Colaborás en proyectos del Estudio</li></ul></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="blk" id="beneficios" style="padding-top:40px;background:var(--surface);border-block:1px solid var(--line)">
+    <div class="wrap">
+      <div class="eyebrow">Herramientas Proyecta Más</div>
+      <h2 class="big">Lo que usamos en el Estudio, <mark>para tu trabajo</mark></h2>
+      <p class="lead">Planillas, software y manuales para cotizar, documentar y gestionar obras. Para profesionales, estudios y empresas. Pagando por transferencia tenés descuento, o hasta 3 cuotas sin interés.</p>
+      <div class="pgrid">
+        <div class="prod"><span class="unit">+ TECH · PLANILLAS</span><b>Suite Cómputo y Presupuesto PRO</b><span>Todas las planillas de cómputo y presupuesto: obra gruesa, instalaciones, terminaciones y construcción en seco.</span><div class="offs"><span class="off">Transferencia<small>con descuento</small></span><span class="off" style="background:var(--tint)">3 cuotas<small>sin interés</small></span></div><a class="btn wa sm" data-wa="la Suite Cómputo y Presupuesto PRO" href="#" target="_blank" rel="noopener">Consultar por WhatsApp</a></div>
+        <div class="prod"><span class="unit">+ TECH · PLANILLAS</span><b>Planillas por rubro</b><span>Comprá solo el rubro que necesitás para cotizar el trabajo que tenés entre manos.</span><div class="offs"><span class="off">Transferencia<small>con descuento</small></span><span class="off" style="background:var(--tint)">3 cuotas<small>sin interés</small></span></div><a class="btn wa sm" data-wa="las planillas por rubro" href="#" target="_blank" rel="noopener">Consultar por WhatsApp</a></div>
+        <div class="prod"><span class="unit">+ TECH · SOFTWARE</span><b>Software de gestión de obra</b><span>Gastos, pagos, avance y alertas de cada obra en un solo lugar. Pensado para estudios, constructoras y desarrollistas.</span><div class="offs"><span class="off">Prueba gratis<small>pedila por WhatsApp</small></span></div><a class="btn wa sm" data-wa="la prueba gratis del software de gestión de obra" href="#" target="_blank" rel="noopener">Consultar por WhatsApp</a></div>
+        <div class="prod"><span class="unit">+ TECH · MANUALES</span><b>Manuales técnicos</b><span>Cómo encarar un proyecto completo desde cero, de la casa al edificio: ejemplos, cálculos, estructura de carpetas y capas DWG.</span><div class="offs"><span class="off">Transferencia<small>con descuento</small></span><span class="off" style="background:var(--tint)">3 cuotas<small>sin interés</small></span></div><a class="btn wa sm" data-wa="los manuales técnicos" href="#" target="_blank" rel="noopener">Consultar por WhatsApp</a></div>
+        <div class="prod"><span class="unit">+ TECH · SOFTWARE</span><b>Software de cómputo y presupuesto</b><span>En desarrollo. Cómputo y presupuesto de obra en la web, por rubro. Anotate para probarlo antes que nadie.</span><div class="offs"><span class="off">Próximamente<small>acceso anticipado</small></span></div><a class="btn wa sm" data-wa="el acceso anticipado al software de cómputo y presupuesto" href="#" target="_blank" rel="noopener">Consultar por WhatsApp</a></div>
+        <div class="prod"><span class="unit">+ TECH · CURSOS</span><b>Cursos cortos</b><span>Cálculo de cañerías de gas, presupuestación, lectura de planos y software técnico.</span><div class="offs"><span class="off">Transferencia<small>con descuento</small></span><span class="off" style="background:var(--tint)">3 cuotas<small>sin interés</small></span></div><a class="btn wa sm" data-wa="los cursos cortos" href="#" target="_blank" rel="noopener">Consultar por WhatsApp</a></div>
+        <div class="prod pro-only" hidden><span class="unit">+ ESTUDIO</span><b>Tercerizá en Proyecta Más</b><span>¿Ganaste un proyecto y te falta una parte? Renders, BIM, instalaciones o cómputo, con prioridad para profesionales de la Red.</span><div class="offs"><span class="off">Prioridad<small>de agenda</small></span></div><a class="btn wa sm" data-wa="tercerizar una parte de un proyecto (soy de la Red)" href="#" target="_blank" rel="noopener">Consultar por WhatsApp</a></div>
+      </div>
+      <p class="fine">Las condiciones de pago son las mismas de la tienda Proyecta Más. Cada consulta abre WhatsApp con el mensaje listo.</p>
+    </div>
+  </section>
+
+  <section class="blk" id="quien">
+    <div class="wrap">
+      <div class="eyebrow">Reglas de la Red</div>
+      <h2 class="big">Quién publica y <mark>quién propone</mark></h2>
+      <p class="lead">La Red existe para que profesionales que arrancan consigan trabajo sin competir contra estructuras grandes.</p>
+      <div class="who">
+        <div class="y"><h3>Pueden publicar</h3><ul><li>Particulares que van a construir o reformar</li><li>Estudios que tercerizan dibujo, renders o cómputo</li><li>Empresas, constructoras, inmobiliarias y desarrollistas</li></ul></div>
+        <div class="y"><h3>Pueden proponer</h3><ul><li>Arquitectos/as, ingenieros/as y MMO independientes</li><li>Técnicos/as, interioristas y renderistas freelance</li><li>Recién recibidos/as y estudiantes avanzados</li><li>Siempre como persona, con perfil propio</li></ul></div>
+        <div><h3>Calificaciones mutuas</h3><ul><li>Al entregar el trabajo, el cliente califica al profesional y el profesional al cliente</li><li>Se puntúa calidad, plazos, comunicación y pago</li><li>Cada perfil muestra su puntaje y su fidelidad: el porcentaje que volvería a trabajar con esa persona</li><li>Las notas se publican cuando califican los dos</li></ul></div>
+        <div class="n2"><h3>No pueden proponer</h3><ul><li>Estudios de arquitectura o ingeniería</li><li>Empresas y constructoras</li><li>Cuentas compartidas o de agencias</li><li>Excepción: Proyecta Más, solo en proyectos con 5 días sin propuestas</li></ul></div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<div class="view" id="v-mis" hidden>
+  <div class="wrap" style="padding-block:36px 64px;display:grid;gap:16px">
+    <div><div class="eyebrow">Tu actividad</div><h2 class="big">Mis <mark>propuestas</mark></h2><p class="lead">Las que mandaste a revisión aparecen acá con la devolución de Proyecta Más. Corregís, y la enviás al cliente desde la misma pantalla.</p></div>
+    <div id="mislist" class="mislist"></div>
+  </div>
+</div>
+
+<div class="view" id="v-panel" hidden>
+  <div class="wrap" style="padding-block:36px 64px;display:grid;gap:16px">
+    <div><div class="eyebrow">Panel interno · solo Proyecta Más</div><h2 class="big">Revisión de <mark>propuestas</mark></h2><p class="lead">Pendientes: <b id="pcount">0</b>. Leé la propuesta, marcá qué corregir, agregar o sacar, y devolvela o aprobala. Al profesional le llega el aviso por WhatsApp y mail.</p></div>
+    <div class="panel"><div id="plist" class="plist"></div><div id="pdetail" class="pdetail"></div></div>
+    <div class="opin"><div class="kithead"><h3>Opiniones de usuarios</h3><span id="opavg"></span></div><div id="oplist" class="oplist"></div></div>
+  </div>
+</div>
+
+<div class="view" id="v-publicar" hidden>
+  <div class="wrap formwrap">
+    <form class="formbox" id="pubform" autocomplete="off">
+      <div><div class="eyebrow">Gratis · Sin comisiones</div><h1>Publicá tu proyecto</h1></div>
+      <fieldset>
+        <legend><i>1</i>Quién publica</legend>
+        <div class="choice">
+          <label><input type="radio" name="tipo" value="Particular" checked> Particular</label>
+          <label><input type="radio" name="tipo" value="Estudio"> Estudio</label>
+          <label><input type="radio" name="tipo" value="Empresa"> Empresa / constructora / inmobiliaria</label>
+        </div>
+      </fieldset>
+      <fieldset>
+        <legend><i>2</i>El proyecto</legend>
+        <label class="f">Título <small>Qué necesitás, en una línea</small><input id="p-titulo" required maxlength="90" placeholder="Anteproyecto de vivienda en terreno con desnivel"></label>
+        <div class="row">
+          <label class="f">Rubro<select id="p-rubro" required></select></label>
+          <label class="f">Tipo de trabajo<select id="p-trabajo" required></select></label>
+        </div>
+        <label class="f">Descripción <small>Programa de necesidades, estilo, referencias y lo que ya tenés (planos, mensura, fotos)</small><textarea id="p-desc" required placeholder="Casa de 2 plantas con 3 dormitorios, cochera para 2 autos y quincho. Tengo la mensura en PDF."></textarea></label>
+        <label class="f">Entregables esperados <small>Opcional</small><input id="p-entreg" placeholder="Plantas, cortes, fachadas, 4 renders, PDF + DWG"></label>
+      </fieldset>
+      <fieldset>
+        <legend><i>3</i>Terreno y medidas</legend>
+        <div class="row">
+          <label class="f">Frente (m)<input id="p-frente" type="number" step="0.01" min="0" placeholder="10,00"></label>
+          <label class="f">Fondo (m)<input id="p-fondo" type="number" step="0.01" min="0" placeholder="25,00"></label>
+          <label class="f">Sup. a proyectar (m²)<input id="p-sup" type="number" step="1" min="0" placeholder="180"></label>
+        </div>
+        <label class="f">Desnivel u otra particularidad<input id="p-desnivel" placeholder="El fondo está 1,50 m más alto · lote en esquina · medianeras construidas"></label>
+      </fieldset>
+      <fieldset>
+        <legend><i>4</i>Ubicación, plazo y presupuesto</legend>
+        <div class="row">
+          <label class="f">Provincia<select id="p-prov" required></select></label>
+          <label class="f">Localidad<input id="p-loc" required placeholder="Rosario"></label>
+        </div>
+        <div class="row">
+          <label class="f">Plazo<input id="p-plazo" placeholder="30 días"></label>
+          <label class="f">Presupuesto <small>Opcional</small><input id="p-pres" placeholder="$450.000 o “a convenir”"></label>
+        </div>
+        <div class="choice">
+          <label><input type="radio" name="mod" value="Remoto" checked> Se puede hacer remoto</label>
+          <label><input type="radio" name="mod" value="Presencial"> Necesita visitar la obra</label>
+        </div>
+      </fieldset>
+      <fieldset>
+        <legend><i>5</i>Etiquetas</legend>
+        <div class="chipin" id="chipin"><input id="p-tag" placeholder="Escribí y apretá Enter" aria-label="Agregar etiqueta"></div>
+        <div class="suggest" id="suggest">Sugeridas:</div>
+      </fieldset>
+      <fieldset>
+        <legend><i>6</i>Propuestas</legend>
+        <label class="f" style="max-width:300px">¿Cuántas propuestas querés recibir?<select id="p-max"><option>3</option><option selected>5</option><option>10</option><option>15</option><option>20</option></select></label>
+        <div class="note">Cuando llegues al número de propuestas, el proyecto se cierra. Si no te convence ninguna, podés reabrir cupos.</div>
+      </fieldset>
+      <div class="inline"><button class="btn" type="submit">Publicar proyecto</button><button class="btn o" type="reset">Limpiar</button></div>
+    </form>
+    <aside class="aside">
+      <div class="asidecard y"><b>Cuantos más datos, mejores propuestas</b><span>Las medidas del terreno, lo que ya tenés y qué entregables esperás evitan propuestas genéricas.</span></div>
+      <div class="asidecard"><b>Vas a recibir preguntas</b><span>Los profesionales pueden preguntar antes de proponer. Las respuestas quedan públicas, así no te preguntan lo mismo dos veces.</span></div>
+      <div class="asidecard"><b>Nunca te quedás sin respuesta</b><span>Si en 5 días nadie propone, Proyecta Más te envía una propuesta.</span></div>
+    </aside>
+  </div>
+</div>
+
+<div class="view" id="v-registro" hidden>
+  <div class="wrap formwrap">
+    <div id="regside" style="min-width:0">
+      <form class="formbox" id="regform" autocomplete="off">
+        <div><div class="eyebrow">Solo profesionales independientes</div><h1>Sumate a la Red</h1></div>
+        <div class="note">Te registrás como persona. Los estudios y empresas pueden publicar proyectos, pero no enviar propuestas.</div>
+        <fieldset>
+          <legend><i>1</i>Tus datos</legend>
+          <div class="row">
+            <label class="f">Nombre y apellido<input id="r-nombre" required placeholder="Lucía Martínez"></label>
+            <label class="f">Provincia<select id="r-prov" required></select></label>
+            <label class="f">Localidad<input id="r-loc" placeholder="Rosario"></label>
+          </div>
+        </fieldset>
+        <fieldset>
+          <legend><i>2</i>Formación</legend>
+          <div class="row">
+            <label class="f">Título<select id="r-titulo" required>
+              <option>Arquitecto/a</option><option>Ingeniero/a civil</option><option>Ingeniero/a electricista</option><option>Ingeniero/a mecánico/a</option><option>Maestro Mayor de Obras</option><option>Técnico/a en construcciones</option><option>Diseñador/a de interiores</option><option>Modelador/a 3D / renderista</option><option>Estudiante avanzado/a</option></select></label>
+            <label class="f">Año de egreso <small>o “cursando”</small><input id="r-egreso" placeholder="2025"></label>
+            <label class="f">Matrícula <small>Opcional</small><input id="r-mat" placeholder="CPT 1234"></label>
+          </div>
+        </fieldset>
+        <fieldset>
+          <legend><i>3</i>Qué hacés</legend>
+          <label class="f">Especialidades y software <small>En qué querés trabajar</small><textarea id="r-bio" placeholder="Anteproyectos residenciales, Revit LOD 300, renders en D5, planos eléctricos AEA."></textarea></label>
+          <label class="f">Portfolio <small>Behance, Drive o Instagram. Sirven los trabajos de facultad.</small><input id="r-port" placeholder="https://"></label>
+          <div class="choice" aria-label="Qué buscás">
+            <label><input type="checkbox" checked> Trabajo remoto</label>
+            <label><input type="checkbox"> Trabajo en mi zona</label>
+            <label><input type="checkbox" checked> Quiero revisión de mis primeras propuestas</label>
+          </div>
+        </fieldset>
+        <label class="check"><input type="checkbox" id="r-decl" required> <span>Me registro como <b>persona</b>, de forma independiente, y no en nombre de un estudio o empresa.</span></label>
+        <div class="inline"><button class="btn" type="submit">Crear mi perfil</button></div>
+      </form>
+    </div>
+    <aside class="aside">
+      <div class="asidecard y"><b>Al registrarte recibís</b><ul><li>Acceso a todos los proyectos</li><li>Plantillas de propuesta y presupuesto</li><li>Beneficios en planillas, software y cursos</li><li>Revisión de tus primeras 3 propuestas</li></ul></div>
+      <div class="asidecard"><b>No tenés proyectos propios para mostrar</b><span>No importa. Subí trabajos de facultad o un proyecto ficticio bien presentado. Muchos clientes valoran más una propuesta clara que un portfolio grande.</span></div>
+    </aside>
+  </div>
+</div>
+</main>
+
+<footer><div class="wrap"><span><b style="font-family:var(--f-logo);font-weight:400;font-size:18px;color:var(--blue);letter-spacing:.03em">PROYECTA MÁS</b> · Red de profesionales independientes</span><span>La Red no cobra comisiones ni interviene en los pagos entre las partes.</span><button type="button" class="linkbtn" id="goadmin">Panel interno (vista de prueba)</button></div></footer>
+
+<dialog id="dlg" aria-labelledby="dl-title"><div class="dl" id="dlbody"></div></dialog>
+<dialog id="fb" class="fbdlg" aria-labelledby="fb-title"><div class="dl" id="fbbody"></div></dialog>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+/* WhatsApp de Proyecta Más: reemplazar por el número real (549 + característica sin 0 + número sin 15) */
+const WA_NUM="5493425104877",WA_SHOW="+54 9 342 510-4877";
+const waLink=t=>`https://wa.me/${WA_NUM}?text=${encodeURIComponent(t)}`;
+document.querySelectorAll("[data-wa]").forEach(a=>a.href=waLink(`Hola, vengo de la Red Proyecta Más y quiero info sobre ${a.dataset.wa}.`));
+const RUBROS=["Arquitectura","Instalación eléctrica","Instalación sanitaria y gas","Estructuras","Visualización 3D y renders","BIM / Revit","Cómputo y presupuesto","Interiorismo","Relevamiento y regularización","Climatización"];
+const TRABAJOS=["Anteproyecto","Proyecto completo","Documentación técnica","Planos de instalación","Modelado 3D","Renders","Cómputo y presupuesto","Relevamiento","Consulta / asesoramiento"];
+const PROVS=["Buenos Aires","CABA","Catamarca","Chaco","Chubut","Córdoba","Corrientes","Entre Ríos","Formosa","Jujuy","La Pampa","La Rioja","Mendoza","Misiones","Neuquén","Río Negro","Salta","San Juan","San Luis","Santa Cruz","Santa Fe","Santiago del Estero","Tierra del Fuego","Tucumán"];
+const SUGG=["vivienda","anteproyecto","render","desnivel","Revit","AutoCAD","reforma","local comercial","PH","eléctrico","gas","pileta","steel frame","SIP"];
+const TEMPLATE=`Hola, soy [nombre], [título] recibido/a en [año].
+
+Cómo lo encararía:
+1. Implantación y distribución inicial
+2. Ajustes de plantas con tus comentarios
+3. Fachadas, cortes y modelo 3D
+4. Renders y entrega final
+
+Qué entrego:
+- [plantas, cortes, fachadas, renders…]
+- Archivos PDF + DWG
+
+Revisiones incluidas: 2 rondas por etapa
+Plazo: [días]
+Precio total: [$]
+Forma de pago: 30% al inicio, 70% contra entrega
+
+Portfolio: [link]`;
+
+let projects=[
+ {id:1,ej:true,titulo:"Anteproyecto de vivienda con oficina y pileta en terreno con desnivel",tipo:"Particular",rubro:"Arquitectura",trabajo:"Anteproyecto",mod:"Remoto",desc:"Casa de 2 plantas + terraza verde al fondo del lote, oficina independiente con baño al frente, cochera para 3 autos y pileta en el medio. Los primeros 14 m están a nivel de vereda y el fondo sube 1,50 m. Estilo contemporáneo: hormigón visto, piedra, madera y carpinterías negras.",entreg:"Implantación, plantas, cortes con desnivel, fachadas, modelo 3D y 4 renders. PDF + DWG.",frente:10,fondo:24.5,sup:220,desnivel:"+1,50 m desde los 14 m",prov:"Santa Fe",loc:"Funes",plazo:"45 días",pres:"$500.000",tags:["vivienda","anteproyecto","render","desnivel","pileta"],max:10,props:3,dias:1,first:true,pm:false,
+  qa:[{q:"¿Tenés plano de mensura o solo medidas aproximadas?",a:"Tengo la mensura en PDF, la comparto con quien quede."},{q:"¿La terraza lleva parrilla o solo deck?",a:"Parrilla chica y deck, sin techo."}],
+  ejprops:[{av:"LM",nom:"Lucía M.",sub:"Arquitecta · recibida en 2025",precio:"$480.000",plazo:"40 días",txt:"Propongo resolver el desnivel con la pileta y el área social sobre la plataforma de +1,50, apoyada en el muro de contención, y dejar cochera y oficina a nivel de vereda. Así la casa gana privacidad sin escaleras largas.\n\nEntrego implantación, plantas, 2 cortes por el desnivel, 4 fachadas, modelo 3D en SketchUp y 4 renders en D5. Incluyo 2 rondas de ajustes por etapa.\n\nPago: 30% al inicio, 30% al aprobar plantas y 40% con los renders."}]},
+ {id:2,ej:true,titulo:"Plano eléctrico para local comercial de 80 m²",tipo:"Empresa",rubro:"Instalación eléctrica",trabajo:"Planos de instalación",mod:"Remoto",desc:"Inmobiliaria necesita plano eléctrico con unifilar y planilla de cargas para habilitar un local gastronómico chico. Hay plano de arquitectura en DWG.",entreg:"Plano de instalación, unifilar, planilla de cargas. DWG + PDF.",frente:6,fondo:13.5,sup:80,desnivel:"",prov:"Santa Fe",loc:"Rosario",plazo:"10 días",pres:"A convenir",tags:["eléctrico","local comercial","AutoCAD"],max:5,props:5,dias:3,first:true,pm:false,qa:[],ejprops:[]},
+ {id:3,ej:true,titulo:"Cómputo y presupuesto para ampliación de 2 dormitorios",tipo:"Particular",rubro:"Cómputo y presupuesto",trabajo:"Cómputo y presupuesto",mod:"Remoto",desc:"Tengo los planos aprobados de una ampliación en planta alta (2 dormitorios + baño, 38 m²). Necesito cómputo de materiales y presupuesto de mano de obra para comparar con lo que me pasaron los constructores.",entreg:"Planilla de cómputo y presupuesto por rubro.",frente:"",fondo:"",sup:38,desnivel:"Planta alta sobre losa existente",prov:"Córdoba",loc:"Villa Allende",plazo:"7 días",pres:"",tags:["reforma","cómputo","planta alta"],max:8,props:1,dias:6,first:true,pm:true,
+  qa:[{q:"¿La losa existente está calculada para una planta más?",a:"Sí, lo verificó un ingeniero cuando se hizo la casa."}],
+  ejprops:[{pm:true,av:"P+",nom:"Proyecta Más",sub:"Propuesta de respaldo · 5 días sin propuestas",precio:"$180.000",plazo:"5 días",txt:"Hacemos el cómputo completo por rubro con nuestra Suite de Cómputo y Presupuesto: materiales con cantidades y mano de obra según escala UOCRA vigente.\n\nTe entregamos la planilla editable para que compares rubro por rubro con los presupuestos de los constructores."}]},
+ {id:4,ej:true,titulo:"Modelado Revit de edificio PB + 3 desde planos en PDF",tipo:"Estudio",rubro:"BIM / Revit",trabajo:"Modelado 3D",mod:"Remoto",desc:"Estudio busca colaborador/a freelance para modelar en Revit (LOD 300) un edificio de PB + 3 pisos con 8 departamentos. Pasamos plantas, cortes y fachadas en PDF y una plantilla propia.",entreg:"Modelo .rvt LOD 300 con familias de carpinterías.",frente:8.66,fondo:30,sup:640,desnivel:"",prov:"CABA",loc:"Caballito",plazo:"20 días",pres:"$900.000",tags:["Revit","edificio","LOD 300"],max:15,props:7,dias:2,first:false,pm:false,qa:[{q:"¿Incluye familias de carpinterías a medida?",a:"Sí, son 6 tipos; mandamos las planillas."}],ejprops:[]},
+ {id:5,ej:true,titulo:"Relevamiento y plano para regularizar quincho y garaje",tipo:"Particular",rubro:"Relevamiento y regularización",trabajo:"Relevamiento",mod:"Presencial",desc:"Construí un quincho de 30 m² y un garaje sin permiso. Necesito relevamiento y planos para regularizar ante el municipio. Busco a alguien de la zona.",entreg:"Relevamiento y planos de regularización.",frente:12,fondo:35,sup:58,desnivel:"",prov:"Buenos Aires",loc:"Mar del Plata",plazo:"A convenir",pres:"$280.000",tags:["regularización","relevamiento","quincho"],max:6,props:1,dias:4,first:true,pm:false,qa:[],ejprops:[]},
+ {id:6,ej:true,titulo:"Proyecto de gas para cocina de PH",tipo:"Particular",rubro:"Instalación sanitaria y gas",trabajo:"Planos de instalación",mod:"Presencial",desc:"Remodelo la cocina de un PH y cambio de lugar la cocina y el calefón. Necesito el proyecto de gas para presentar a la distribuidora.",entreg:"Plano de gas con cálculo de cañerías.",frente:"",fondo:"",sup:14,desnivel:"",prov:"Santa Fe",loc:"Santa Fe",plazo:"15 días",pres:"A convenir",tags:["gas","PH","reforma"],max:3,props:0,dias:0,first:true,pm:false,qa:[],ejprops:[]}
+];
+projects.push({id:7,ej:true,entregado:true,prof:"Martín R.",titulo:"Planos de cocina y placares a medida para departamento",tipo:"Particular",rubro:"Interiorismo",trabajo:"Documentación técnica",mod:"Remoto",desc:"Planos de fabricación de bajo mesada, alacena y dos placares para que los haga un carpintero. Medidas relevadas por mí, con fotos de cada pared.",entreg:"Plantas, vistas y cortes acotados de cada mueble, con despiece. PDF + DWG.",frente:"",fondo:"",sup:12,desnivel:"",prov:"Entre Ríos",loc:"Paraná",plazo:"10 días",pres:"$190.000",tags:["interiorismo","muebles a medida","placares"],max:5,props:5,dias:18,first:false,pm:false,qa:[{q:"¿Las bachas y el anafe ya están comprados?",a:"Sí, paso los modelos con sus medidas."}],ejprops:[]});
+
+/* Reputación: [promedio, cantidad de calificaciones, fidelidad %] — valores de ejemplo */
+const CLI={1:[4.8,3,100],2:[4.6,11,91],3:[0,0,0],4:[4.9,8,100],5:[4.5,2,100],6:[0,0,0],7:[4.7,4,100]};
+projects.forEach(p=>p.cli=CLI[p.id]||[0,0,0]);
+projects[0].ejprops[0].rep=[4.9,3,100];
+projects[2].ejprops[0].rep=[5,12,100];
+const PROREP={"Martín R.":[4.8,6,100]};
+const RATE_CRIT={
+  cli:{titulo:p=>`Calificá a ${p.prof}`,quien:"Lo completa quien publicó",crits:[["cal","Calidad del trabajo"],["pla","Cumplimiento de plazos"],["com","Comunicación"]],fid:"¿Lo volverías a contratar?"},
+  pro:{titulo:()=>"Calificá al cliente",quien:p=>`Lo completa ${p.prof}`,crits:[["cla","Claridad del pedido"],["pag","Pago en tiempo y forma"],["res","Respeto de lo acordado"]],fid:"¿Volverías a trabajar con este cliente?"}
+};
+let tagFilter="",newTags=[],nextId=8,isPro=false;
+
+function stars(v){const r=Math.round(v);return "★".repeat(r)+"☆".repeat(5-r);}
+function repHTML(rep,who){
+  if(!rep||!rep[1])return`<span class="rep">${who} nuevo · sin calificaciones todavía</span>`;
+  return`<span class="rep">${who} <span class="st" aria-hidden="true">${stars(rep[0])}</span><b>${String(rep[0].toFixed(1)).replace(".",",")}</b> (${rep[1]}) · fidelidad <b>${rep[2]}%</b></span>`;
+}
+function rateBlock(p){
+  p.rates=p.rates||{cli:null,pro:null};p.draft=p.draft||{cli:{},pro:{}};
+  const both=p.rates.cli&&p.rates.pro;
+  const box=side=>{
+    const c=RATE_CRIT[side],done=p.rates[side],tit=typeof c.titulo==="function"?c.titulo(p):c.titulo,qn=typeof c.quien==="function"?c.quien(p):c.quien;
+    if(done&&!both)return`<div class="ratebox"><h5>${esc(tit)}</h5><small>${esc(qn)}</small><div class="sent">Calificación enviada. Se publica cuando califique la otra parte.</div></div>`;
+    if(both){const avg=Object.values(done.v).reduce((a,b)=>a+b,0)/Object.values(done.v).length;
+      return`<div class="ratebox"><h5>${esc(tit)}</h5><small>${esc(qn)}</small><div class="result"><span class="big2">${String(avg.toFixed(1)).replace(".",",")}</span><span class="rep"><span class="st">${stars(avg)}</span></span><span class="rep">${esc(c.fid)} <b>${done.fid?"Sí":"No"}</b></span></div>${done.txt?`<small>“${esc(done.txt)}”</small>`:""}</div>`;}
+    const d=p.draft[side];
+    return`<div class="ratebox" data-side="${side}"><h5>${esc(tit)}</h5><small>${esc(qn)}</small>
+      ${c.crits.map(([k,l])=>`<div class="crit"><span>${l}</span><span class="stars" role="radiogroup" aria-label="${l}">${[1,2,3,4,5].map(n=>`<button type="button" data-k="${k}" data-n="${n}" aria-label="${n} de 5" class="${(d[k]||0)>=n?"on":""}">★</button>`).join("")}</span></div>`).join("")}
+      <div class="crit"><span><b>Fidelidad.</b> ${esc(c.fid)}</span><span class="yn"><button type="button" data-fid="1" class="${d.fid===true?"on":""}">Sí</button><button type="button" data-fid="0" class="${d.fid===false?"on":""}">No</button></span></div>
+      <input data-txt placeholder="Comentario (opcional)" value="${esc(d.txt||"")}" aria-label="Comentario">
+      <div><button type="button" class="btn sm" data-send>Enviar calificación</button></div></div>`;
+  };
+  return`<div><h4>Calificaciones del proyecto</h4>
+    <div class="meta" style="margin-bottom:10px"><span>Entregado por <b>${esc(p.prof)}</b></span>${repHTML(PROREP[p.prof],"Profesional")}</div>
+    <div class="rategrid">${box("cli")}${box("pro")}</div>
+    <p class="fine" style="margin-top:8px">Cada parte califica por separado y las notas se publican cuando califican los dos, o a los 14 días. Así nadie puntúa en respuesta a la nota del otro. En esta vista de prueba podés completar las dos.</p></div>`;
+}
+function bindRate(p,id){
+  document.querySelectorAll(".ratebox[data-side]").forEach(b=>{
+    const side=b.dataset.side,d=p.draft[side];
+    b.querySelectorAll(".stars button").forEach(x=>x.onclick=()=>{d[x.dataset.k]=+x.dataset.n;d.txt=b.querySelector("[data-txt]").value;openP(id);});
+    b.querySelectorAll("[data-fid]").forEach(x=>x.onclick=()=>{d.fid=x.dataset.fid==="1";d.txt=b.querySelector("[data-txt]").value;openP(id);});
+    b.querySelector("[data-send]").onclick=()=>{
+      d.txt=b.querySelector("[data-txt]").value.trim();
+      const keys=RATE_CRIT[side].crits.map(c=>c[0]);
+      if(keys.some(k=>!d[k])||d.fid===undefined){toast("Completá las estrellas y la pregunta de fidelidad");return;}
+      p.rates[side]={v:Object.fromEntries(keys.map(k=>[k,d[k]])),fid:d.fid,txt:d.txt};
+      openP(id);toast(p.rates.cli&&p.rates.pro?"Calificaciones publicadas":"Calificación enviada");
+    };
+  });
+}
+
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function fill(sel,arr){const el=$(sel);arr.forEach(v=>el.insertAdjacentHTML("beforeend",`<option>${esc(v)}</option>`));}
+fill("#f-rubro",RUBROS);fill("#f-prov",PROVS);fill("#p-rubro",RUBROS);fill("#p-trabajo",TRABAJOS);fill("#p-prov",PROVS);fill("#r-prov",PROVS);
+$("#p-prov").value="Santa Fe";$("#r-prov").value="Santa Fe";
+
+function toast(m){const t=$("#toast");t.textContent=m;t.hidden=false;clearTimeout(t._t);t._t=setTimeout(()=>t.hidden=true,2800);}
+function status(p){
+  if(p.entregado)return`<span class="pill done">Entregado</span>`;
+  if(p.props>=p.max)return`<span class="pill full">Cupo completo</span>`;
+  if(p.reab)return`<span class="pill open">Cupos reabiertos</span>`;
+  if(p.pm)return`<span class="pill pm">Con propuesta Proyecta Más</span>`;
+  if(p.props===0&&p.dias>=5)return`<span class="pill none">Sin propuestas</span>`;
+  return`<span class="pill open">Abierto</span>`;
+}
+const num=v=>String(v).replace(".",",");
+function specs(p){const s=[];if(p.frente&&p.fondo)s.push(`${num(p.frente)} × ${num(p.fondo)} m`);if(p.sup)s.push(`${p.sup} m²`);if(p.desnivel)s.push(esc(p.desnivel));return s.map(x=>`<span>${x}</span>`).join("");}
+const ago=d=>d===0?"hoy":d===1?"hace 1 día":`hace ${d} días`;
+function cupo(p){const n=Math.min(p.max,20),on=Math.round(p.props/p.max*n);let h="";for(let i=0;i<n;i++)h+=`<i class="${i<on?"on":""}"></i>`;return h;}
+
+function render(){
+  const q=$("#q").value.trim().toLowerCase(),r=$("#f-rubro").value,pv=$("#f-prov").value,cu=$("#f-cupo").value;
+  const list=projects.filter(p=>(!q||(p.titulo+p.desc+p.tags.join(" ")+p.loc).toLowerCase().includes(q))&&(!r||p.rubro===r)&&(!pv||p.prov===pv)&&(!cu||(cu==="libre"?p.props<p.max:p.props>=p.max))&&(!tagFilter||p.tags.includes(tagFilter)));
+  $("#activetag").innerHTML=tagFilter?`Etiqueta: <button type="button" id="cleartag">#${esc(tagFilter)} ✕</button>`:"";
+  if(tagFilter)$("#cleartag").onclick=()=>{tagFilter="";render();};
+  $("#grid").innerHTML=list.length?list.map(p=>`
+   <article class="card" tabindex="0" data-id="${p.id}" role="button" aria-label="Ver ${esc(p.titulo)}">
+    ${p.ej?'<span class="stamp">EJEMPLO</span>':""}
+    <div class="cbody">
+     <div class="meta">${status(p)}</div>
+     <h3>${esc(p.titulo)}</h3>
+     <p>${esc(p.desc)}</p>
+     <div class="specs">${specs(p)}</div>
+     <div class="tags">${p.tags.map(t=>`<button type="button" class="tag" data-tag="${esc(t)}">#${esc(t)}</button>`).join("")}</div>
+     <div class="meta">${esc(p.tipo)} · ${esc(p.mod)} · publicado ${ago(p.dias)} · ${p.qa.length} preguntas</div>
+     <div>${repHTML(p.cli,"Cliente")}</div>
+    </div>
+    <div class="rotulo">
+     <div><small>Trabajo</small><b>${esc(p.trabajo)}</b></div>
+     <div><small>Ubicación</small><b>${esc(p.loc)}</b></div>
+     <div><small>Propuestas ${p.props}/${p.max}</small><div class="cupo">${cupo(p)}</div></div>
+    </div>
+   </article>`).join(""):`<div class="empty">No hay proyectos con esos filtros. Probá quitando alguno.</div>`;
+}
+$("#grid").addEventListener("click",e=>{const tg=e.target.closest(".tag");if(tg){e.stopPropagation();tagFilter=tg.dataset.tag;render();return;}const c=e.target.closest(".card");if(c)openP(+c.dataset.id);});
+$("#grid").addEventListener("keydown",e=>{if(e.key==="Enter"&&e.target.classList.contains("card"))openP(+e.target.dataset.id);});
+["#q","#f-rubro","#f-prov","#f-cupo"].forEach(s=>$(s).addEventListener("input",render));
+
+function propHTML(x){return`<div class="prop ${x.pm?"pmp":""}"><span class="stamp">EJEMPLO</span>
+  <div class="who2"><span class="av">${esc(x.av)}</span><div><b>${esc(x.nom)}</b><small>${esc(x.sub)}</small>${x.rep?repHTML(x.rep,"Profesional"):""}</div></div>
+  <div class="propnums"><span>Precio ${esc(x.precio)}</span><span>Plazo ${esc(x.plazo)}</span></div>
+  <pre>${esc(x.txt)}</pre></div>`;}
+
+function openP(id){
+  const p=projects.find(x=>x.id===id),full=p.props>=p.max,left=p.max-p.props;
+  const sheet=[["Frente",p.frente?num(p.frente)+" m":"—"],["Fondo",p.fondo?num(p.fondo)+" m":"—"],["Superficie",p.sup?p.sup+" m²":"—"],["Particularidad",p.desnivel||"—"],["Plazo",p.plazo||"—"],["Presupuesto",p.pres||"No indicado"]];
+  $("#dlbody").innerHTML=`
+   <div class="dlhead"><div class="meta">${p.ej?'<span class="pill" style="border:1.5px solid var(--blue);background:transparent;color:var(--blue)">EJEMPLO</span>':""}${status(p)}</div><button class="x" id="x" aria-label="Cerrar">✕</button></div>
+   <div><div class="meta" style="margin-bottom:6px">${esc(p.tipo)} · ${esc(p.loc)}, ${esc(p.prov)} · ${esc(p.mod)} · publicado ${ago(p.dias)}</div><h2 id="dl-title">${esc(p.titulo)}</h2><div style="margin-top:6px">${repHTML(p.cli,"Quien publica")}</div></div>
+   <div class="meta"><span class="pill">${esc(p.rubro)}</span><span class="pill">${esc(p.trabajo)}</span>${p.tags.map(t=>`<span class="pill">#${esc(t)}</span>`).join("")}</div>
+   <div><h4>Descripción</h4><p style="margin:0;max-width:65ch">${esc(p.desc)}</p>${p.entreg?`<p style="margin:8px 0 0;max-width:65ch"><b>Entregables:</b> ${esc(p.entreg)}</p>`:""}</div>
+   <div><h4>Ficha del terreno</h4><div class="sheet">${sheet.map(([k,v])=>`<div><small>${k}</small><b>${esc(v)}</b></div>`).join("")}</div></div>
+   <div><h4>Preguntas públicas (${p.qa.length})</h4><div class="qa">${p.qa.map(x=>`<div class="q">${esc(x.q)}<div class="a">${x.a?`<b>Respuesta:</b> ${esc(x.a)}`:"Esperando respuesta de quien publicó"}</div></div>`).join("")||'<div class="note">Nadie preguntó todavía. Si te falta un dato, preguntá antes de proponer.</div>'}</div>
+    <form class="inline" id="qform" style="margin-top:10px"><input id="qin" required placeholder="¿Hay plano de mensura? ¿Qué software preferís?" aria-label="Tu pregunta"><button class="btn o sm" type="submit">Preguntar</button></form></div>
+   ${p.entregado?rateBlock(p):""}
+   ${p.ejprops.length?`<div><h4>Así se ve una buena propuesta</h4><div style="display:grid;gap:10px">${p.ejprops.map(propHTML).join("")}</div><p class="fine" style="margin-top:8px">En la plataforma real, cada propuesta solo la ve quien publicó. Estas se muestran como ejemplo para aprender.</p></div>`:""}
+   ${p.entregado?"":`<div><h4>Enviar tu propuesta ${full?"":`· quedan ${left} de ${p.max}`}</h4>
+    ${full?`<div style="display:grid;gap:10px"><div class="note">Quien publicó pidió ${p.max} propuestas y ya las recibió. Por ahora el proyecto no acepta más.</div>
+     <div class="reopen"><b>Recibiste las ${p.max} propuestas que pediste</b><span>¿No te convenció ninguna? Reabrí el proyecto para recibir más propuestas. Las que ya tenés se mantienen.</span>
+      <div class="inline"><select id="reo" aria-label="Cupos a sumar"><option value="3">3 cupos más</option><option value="5" selected>5 cupos más</option><option value="10">10 cupos más</option></select><button type="button" class="btn sm" id="reobtn">Reabrir cupos</button></div>
+      <small>Este recuadro solo lo ve quien publicó el proyecto (vista de prueba).</small></div></div>`:`
+    <form id="pform" style="display:grid;gap:12px">
+     <label class="f"><span style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;align-items:center">Tu propuesta ${isPro?'<button type="button" class="btn o sm" id="tpl">Usar plantilla Proyecta Más</button>':""}</span><small>Cómo lo encararías, qué entregás, cuántas revisiones incluís</small><textarea id="pm" required style="min-height:150px"></textarea></label>
+     <div class="row"><label class="f">Precio total<input id="pp" required placeholder="$450.000"></label><label class="f">Plazo<input id="pz" required placeholder="20 días"></label></div>
+     ${isPro?'<label class="check"><input type="checkbox" id="rev" checked> <span><b>Que Proyecta Más revise mi propuesta antes de enviarla.</b> Te llega una devolución en 24 h hábiles. Disponible en tus primeras 3 propuestas.</span></label>':""}
+     <div class="note">Si quien publica acepta tu propuesta, se comparten los contactos y acuerdan pago y condiciones por fuera de la plataforma.</div>
+     <div><button class="btn y" type="submit">Enviar propuesta</button></div>
+    </form>`}
+   </div>`}`;
+  $("#x").onclick=()=>$("#dlg").close();
+  if(p.entregado)bindRate(p,id);
+  $("#qform").onsubmit=e=>{e.preventDefault();p.qa.push({q:$("#qin").value.trim(),a:""});render();openP(id);toast("Pregunta publicada");};
+  if($("#reobtn"))$("#reobtn").onclick=()=>{p.max+=+$("#reo").value;p.reab=true;render();openP(id);toast("Cupos reabiertos");};
+  const pf=$("#pform");
+  if(pf){if($("#tpl"))$("#tpl").onclick=()=>{$("#pm").value=TEMPLATE;$("#pm").focus();};
+    pf.onsubmit=e=>{e.preventDefault();const rev=!!($("#rev")&&$("#rev").checked);
+      if(isPro)revs.unshift({id:"m"+Date.now(),mine:true,pro:$("#mname").textContent,titulo:p.titulo,pid:p.id,txt:$("#pm").value.trim(),precio:$("#pp").value.trim(),plazo:$("#pz").value.trim(),estado:rev?"revision":"enviada",notas:[],gral:""});
+      if(!rev){p.props++;}render();drawMis();openP(id);toast(rev?"Enviada a revisión. Seguila en Mis propuestas":"Propuesta enviada");askFeedback("propuesta");};}
+  if(!$("#dlg").open)$("#dlg").showModal();
+  $("#dlbody").scrollTop=0;
+}
+$("#dlg").addEventListener("click",e=>{if(e.target.id==="dlg")$("#dlg").close();});
+
+function show(v,anchor){
+  document.querySelectorAll(".view").forEach(s=>s.hidden=s.id!=="v-"+v);
+  if(anchor){const el=document.getElementById(anchor);if(el){el.scrollIntoView();return;}}
+  window.scrollTo(0,0);
+}
+document.querySelectorAll("[data-view]").forEach(b=>b.addEventListener("click",()=>show(b.dataset.view)));
+document.querySelectorAll("[data-go]").forEach(a=>a.addEventListener("click",e=>{e.preventDefault();show("inicio",a.getAttribute("href").slice(1));}));
+$("#home").onclick=()=>show("inicio");
+
+function drawChips(){$("#chipin").querySelectorAll(".chip").forEach(c=>c.remove());newTags.forEach((t,i)=>$("#p-tag").insertAdjacentHTML("beforebegin",`<span class="chip">#${esc(t)}<button type="button" data-i="${i}" aria-label="Quitar ${esc(t)}">✕</button></span>`));}
+function addTag(t){t=t.trim().replace(/^#/,"");if(t&&!newTags.includes(t)&&newTags.length<8){newTags.push(t);drawChips();}}
+$("#p-tag").addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===","){e.preventDefault();addTag(e.target.value);e.target.value="";}});
+$("#chipin").addEventListener("click",e=>{const b=e.target.closest("button");if(b){newTags.splice(+b.dataset.i,1);drawChips();}});
+SUGG.forEach(s=>$("#suggest").insertAdjacentHTML("beforeend",`<button type="button" class="tag" data-s="${esc(s)}">#${esc(s)}</button>`));
+$("#suggest").addEventListener("click",e=>{const b=e.target.closest("[data-s]");if(b)addTag(b.dataset.s);});
+
+$("#pubform").addEventListener("submit",e=>{
+  e.preventDefault();const pend=$("#p-tag").value;if(pend){addTag(pend);$("#p-tag").value="";}
+  projects.unshift({id:nextId++,ej:false,titulo:$("#p-titulo").value.trim(),tipo:document.querySelector('input[name=tipo]:checked').value,rubro:$("#p-rubro").value,trabajo:$("#p-trabajo").value,mod:document.querySelector('input[name=mod]:checked').value,desc:$("#p-desc").value.trim(),entreg:$("#p-entreg").value.trim(),frente:$("#p-frente").value,fondo:$("#p-fondo").value,sup:$("#p-sup").value,desnivel:$("#p-desnivel").value.trim(),prov:$("#p-prov").value,loc:$("#p-loc").value.trim(),plazo:$("#p-plazo").value.trim(),pres:$("#p-pres").value.trim(),tags:[...newTags],max:+$("#p-max").value,props:0,dias:0,first:false,pm:false,qa:[],ejprops:[]});
+  e.target.reset();newTags=[];drawChips();$("#p-prov").value="Santa Fe";
+  show("inicio","proyectos");render();toast("Proyecto publicado");askFeedback("publicación");
+});
+$("#pubform").addEventListener("reset",()=>{newTags=[];drawChips();});
+
+$("#regform").addEventListener("submit",e=>{
+  e.preventDefault();
+  const nombre=$("#r-nombre").value.trim().split(" ")[0]||"colega";
+  $("#regside").innerHTML=`<div class="welcome">
+    <div class="eyebrow">Nivel 1 · Registrado</div>
+    <h2>Bienvenido/a a la Red, ${esc(nombre)}</h2>
+    <p style="margin:0;color:var(--muted)">Ya podés preguntar y enviar propuestas. Tus primeras 3 propuestas las revisa Proyecta Más antes de enviarlas.</p>
+    <div class="coupon"><span>Ya tenés acceso a <b>Respaldo</b>, <b>Camino</b> y <b>Beneficios</b>: productos Proyecta Más con descuento por transferencia o 3 cuotas sin interés.</span></div>
+    <div><h4 style="font:700 13px var(--f-label);letter-spacing:.14em;text-transform:uppercase;color:var(--blue);margin:0 0 8px">Primeros pasos</h4>
+    <ul class="todo"><li>Completá tu portfolio con 2 o 3 trabajos, aunque sean de facultad</li><li>Leé la guía de honorarios antes de cotizar</li><li>Filtrá los proyectos con cupo libre</li><li>Mandá tu primera propuesta con la plantilla y pedí revisión</li></ul></div>
+    <div class="inline"><button class="btn y" id="goboard">Ver proyectos abiertos</button><button class="btn o" id="gobenef">Ver beneficios</button></div></div>`;
+  $("#goboard").onclick=()=>show("inicio","proyectos");$("#gobenef").onclick=()=>show("inicio","beneficios");
+  setPro(true,nombre);window.scrollTo(0,0);toast("Perfil creado");
+});
+
+function setPro(on,nombre){
+  isPro=on;
+  document.querySelectorAll(".pro-only").forEach(el=>el.hidden=!on);
+  document.querySelectorAll(".pub-only").forEach(el=>el.hidden=on);
+  if(nombre)$("#mname").textContent=nombre;
+}
+function demoLogin(){setPro(true,"Lucía");show("inicio","respaldo");toast("Ingresaste como profesional (demo)");}
+$("#login").onclick=demoLogin;
+
+
+/* Calculadora de valor hora */
+(function(){
+  const n=id=>Math.max(0,parseFloat(String($(id).value).replace(/\./g,"").replace(",","."))||0);
+  const ars=v=>"$"+Math.round(v).toLocaleString("es-AR");
+  function calc(){
+    const horas=n("#c-horas")||1,vh=(n("#c-gastos")+n("#c-neto"))/horas;
+    const precio=vh*n("#c-ht")*(1+parseFloat($("#c-margen").value));
+    $("#c-vh").textContent=ars(vh);$("#c-precio").textContent=ars(precio);$("#c-ant").textContent=ars(precio*.3);$("#c-saldo").textContent=ars(precio*.7);
+  }
+  ["#c-gastos","#c-neto","#c-horas","#c-ht","#c-margen"].forEach(id=>$(id).addEventListener("input",calc));
+  calc();
+})();
+
+/* Agenda de llamadas de 30 minutos: martes y jueves, de 18 a 20 h */
+(function(){
+  const HORAS=["18:00","18:30","19:00","19:30"];
+  /* Número de WhatsApp de Proyecta Más: reemplazar por el real (formato 549 + característica + número) */
+  
+  const dias=[];const d=new Date();d.setHours(0,0,0,0);
+  while(dias.length<6){d.setDate(d.getDate()+1);if(d.getDay()===2||d.getDay()===4)dias.push(new Date(d));}
+  const ocupado=(i,h)=>(i*7+h*3)%5===0;
+  let sel={dia:0,hora:null,tema:"Cotización"},reserva=null;
+  const fmtD=x=>x.toLocaleDateString("es-AR",{weekday:"short",day:"numeric",month:"numeric"});
+  function draw(){
+    const box=$("#callbody");
+    if(reserva){
+      box.innerHTML=`<div class="booked"><span class="eyebrow">Llamada reservada</span><b>${reserva.cuando} · ${reserva.hora} h · 30 min</b><span style="font-size:14px">Tema: ${esc(reserva.tema)}${reserva.txt?` · “${esc(reserva.txt)}”`:""}</span><span style="font-size:14px;color:var(--muted)">La llamada es por Google Meet. Confirmá el turno con el botón: se abre WhatsApp con la reserva lista para enviar a Proyecta Más (${WA_SHOW}) y por ahí te mandamos el link de Meet. Si no podés, cancelá con 24 h de anticipación.</span><div class="inline"><a class="btn wa" href="https://wa.me/${WA_NUM}?text=${encodeURIComponent(`Hola, soy ${$("#mname").textContent} de la Red Proyecta Más. Reservé la llamada por Meet del ${reserva.cuando} a las ${reserva.hora} h. Tema: ${reserva.tema}.${reserva.txt?" "+reserva.txt:""}`)}" target="_blank" rel="noopener">Confirmar por WhatsApp</a><button type="button" class="btn o sm" id="cancel">Cancelar reserva</button></div></div>`;
+      $("#cancel").onclick=()=>{reserva=null;sel.hora=null;draw();toast("Reserva cancelada");};return;
+    }
+    box.innerHTML=`
+      <div class="days">${dias.map((x,i)=>`<button type="button" class="day ${i===sel.dia?"on":""}" data-d="${i}">${fmtD(x).split(" ")[0]}<small>${fmtD(x).split(" ").slice(1).join(" ")}</small></button>`).join("")}</div>
+      <div class="slots">${HORAS.map((h,j)=>`<button type="button" class="slot ${sel.hora===h?"on":""}" data-h="${h}" ${ocupado(sel.dia,j)?"disabled":""}>${h}</button>`).join("")}</div>
+      <div class="row"><label class="f">Tema<select id="tema">${["Cotización","Propuesta","Duda técnica","Cliente o cobro","Otro"].map(t=>`<option ${t===sel.tema?"selected":""}>${t}</option>`).join("")}</select></label></div>
+      <label class="f">¿Qué querés resolver? <small>Así la llamada va directo al punto</small><input id="ctxt" maxlength="140" placeholder="Me piden 3 renders y no sé si cobrar aparte el modelo 3D"></label>
+      <div class="note">Antes de reservar, fijate si la respuesta está en los manuales.</div>
+      <div><button type="button" class="btn" id="book" ${sel.hora?"":"disabled"}>Reservar ${sel.hora?fmtD(dias[sel.dia])+" · "+sel.hora:"turno"}</button></div>`;
+    box.querySelectorAll(".day").forEach(b=>b.onclick=()=>{sel.dia=+b.dataset.d;sel.hora=null;draw();});
+    box.querySelectorAll(".slot").forEach(b=>b.onclick=()=>{sel.hora=b.dataset.h;sel.tema=$("#tema").value;const t=$("#ctxt").value;draw();$("#ctxt").value=t;});
+    $("#tema").onchange=e=>sel.tema=e.target.value;
+    $("#book").onclick=()=>{reserva={cuando:fmtD(dias[sel.dia]),hora:sel.hora,tema:$("#tema").value,txt:$("#ctxt").value.trim()};draw();toast("Llamada reservada");};
+  }
+  draw();
+})();
+
+/* ===== Manuales del Kit Primer Cliente ===== */
+const MANUALES={
+9:{t:"Incumbencias: qué podés hacer y firmar",sub:"Manual 9 · Kit Primer Cliente",h:`
+<p class="lede">Las incumbencias son lo que tu título te habilita a hacer y, sobre todo, a firmar. Conocerlas te evita aceptar trabajos que no podés firmar, te protege legalmente y te ayuda a armar equipo con colegas de otros títulos.</p>
+
+<h3>Hacer no es lo mismo que firmar</h3>
+<div class="tbl"><table>
+<thead><tr><th>Lo puede hacer cualquier profesional o técnico</th><th>Requiere firma de un profesional matriculado con incumbencia</th></tr></thead>
+<tbody><tr>
+<td>Dibujo y documentación, modelado 3D y BIM, renders, cómputos y presupuestos, relevamientos, asesoramiento de diseño.</td>
+<td>Planos para presentar al municipio, proyecto y dirección de obra, cálculo de estructuras, instalaciones que aprueban prestatarias o entes (gas, electricidad), regularizaciones y certificaciones.</td>
+</tr></tbody></table></div>
+<p>Buena parte del trabajo que se publica en la Red está en la primera columna. Para lo que necesita firma, el cliente tiene que saber desde el principio quién va a firmar.</p>
+
+<h3>De dónde salen las incumbencias</h3>
+<ul>
+<li><b>Títulos universitarios</b> (arquitectura, ingenierías): las actividades reservadas las fija el Ministerio de Educación de la Nación para cada título.</li>
+<li><b>Títulos técnicos</b> (Maestro Mayor de Obras, técnicos en construcciones e instalaciones): surgen del marco nacional de la educación técnica y de las normas de cada provincia.</li>
+<li><b>Cada colegio provincial</b> las aplica, y puede fijar límites concretos para su jurisdicción.</li>
+</ul>
+
+<h3>Panorama orientativo por título</h3>
+<div class="tbl"><table>
+<thead><tr><th>Título</th><th>En general habilita</th></tr></thead>
+<tbody>
+<tr><td><b>Arquitecto/a</b></td><td>Proyecto, dirección y documentación de obras de arquitectura, urbanismo, interiorismo y paisaje. Estructuras dentro de los límites de su título.</td></tr>
+<tr><td><b>Ingeniero/a civil</b></td><td>Cálculo y dirección de estructuras, obras civiles e hidráulicas, edificios.</td></tr>
+<tr><td><b>Ingeniero/a electricista o electromecánico/a</b></td><td>Instalaciones eléctricas sin el límite de potencia que tienen los títulos técnicos.</td></tr>
+<tr><td><b>Maestro Mayor de Obras</b></td><td>Proyecto, dirección y construcción de edificios de escala limitada, e instalaciones domiciliarias. Los límites de pisos, superficie y estructura los fija cada jurisdicción.</td></tr>
+<tr><td><b>Técnico/a en construcciones o instalaciones</b></td><td>Tareas de su especialidad con alcances más acotados, según la norma provincial.</td></tr>
+</tbody></table></div>
+<p class="ex">Este cuadro es una guía general, no una norma. Los límites exactos varían según la provincia y la resolución de tu título. Pedile a tu colegio el documento de incumbencias de tu título y guardalo.</p>
+
+<h3>Instalaciones: además del título, el registro</h3>
+<p>Para gas, y en muchos lugares para electricidad, no alcanza con el título: tenés que estar inscripto en el registro de la distribuidora o del ente que aprueba la instalación, en la categoría que corresponda.</p>
+
+<h3>Lo que nunca hay que hacer</h3>
+<ul class="errs">
+<li>Firmar planos que no hiciste o no vas a dirigir. Prestar la firma es una falta ética y te hace responsable de lo que salga mal.</li>
+<li>Aceptar un trabajo que excede tu incumbencia “porque después lo firma alguien”, sin aclararlo al cliente.</li>
+<li>Poner en un rótulo una matrícula que no tenés o que está suspendida.</li>
+</ul>
+
+<h3>Cómo trabajar fuera de tu incumbencia</h3>
+<p>Sumá a un colega que sí la tenga. Lo hacés vos, lo firma y lo dirige quien corresponde, y el cliente lo sabe desde la propuesta. En la Red podés encontrar a ese colega.</p>
+`},
+10:{t:"Cómo matricularte en el colegio",sub:"Manual 10 · Kit Primer Cliente",h:`
+<p class="lede">La matrícula es lo que te habilita a firmar. Cada provincia tiene su propia ley y su propio colegio para cada profesión, así que los pasos cambian un poco según dónde trabajes. Esta guía te da el recorrido general y las preguntas que tenés que hacer.</p>
+
+<h3>¿En qué colegio?</h3>
+<ul>
+<li><b>Arquitectos/as:</b> en el Colegio de Arquitectos de la provincia donde vas a ejercer. En Buenos Aires, por ejemplo, es el CAPBA, regido por la Ley 10.405. En Santa Fe, el Colegio de Arquitectos de la Provincia de Santa Fe, organizado por distritos.</li>
+<li><b>Maestros Mayores de Obras y técnicos:</b> en el colegio o consejo de técnicos de tu provincia. En algunas es un colegio propio de MMO y técnicos; en otras se comparte con ingeniería.</li>
+<li>La matrícula es <b>provincial</b>. Para firmar en otra provincia necesitás matricularte allá o usar un convenio de reciprocidad entre colegios, si existe.</li>
+</ul>
+
+<h3>Ficha: MMO y técnicos en Rosario</h3>
+<div class="tbl"><table>
+<tbody>
+<tr><th>Colegio</th><td>Colegio Profesional de Maestros Mayores de Obra y Técnicos de la Provincia de Santa Fe, Distrito 2 (CPT Rosario). Se rige por la Ley 10.946.</td></tr>
+<tr><th>Dónde</th><td>San Juan 549, Rosario. Lunes a viernes de 8 a 13 h. Tel. (0341) 440-8378.</td></tr>
+<tr><th>Consultas</th><td>matriculacion@cptros.org.ar · administracion@cptros.org.ar · cptros.org.ar</td></tr>
+<tr><th>Cómo se inscribe</th><td>Con el formulario online del sitio. No es en el día: después de enviarlo, el colegio te contacta.</td></tr>
+<tr><th>Modalidad</th><td>Matrícula anual por año calendario, como independiente o en relación de dependencia.</td></tr>
+<tr><th>Valores 2026</th><td>Matrícula anual $366.000 en un solo pago. Inscripción $50.000. Se paga por el sistema Gesto del colegio.</td></tr>
+</tbody></table></div>
+<p class="ex">Antes de completar el formulario, el colegio pide leer la Ley 10.946, el estatuto y la sección “Trámites Caja, ARCA, API”, porque después de matricularte hay trámites obligatorios. Valores publicados por el CPT Rosario para 2026: confirmalos en su sitio, porque se actualizan.</p>
+
+<h3>Lo que suelen pedir</h3>
+<ul class="check2">
+<li>Título original y copia legalizada. Si es reciente, puede servir el certificado de título en trámite.</li>
+<li>Certificado analítico.</li>
+<li>DNI y constancia de CUIT.</li>
+<li>Fotos tipo carnet y comprobante de domicilio.</li>
+<li>Formulario de inscripción del colegio.</li>
+<li>Pago del derecho de inscripción.</li>
+</ul>
+<p class="ex">Antes de juntar papeles, mirá la web del colegio o llamá: la lista exacta y los costos cambian.</p>
+
+<h3>Los pasos</h3>
+<ol>
+<li>Legalizá tu título en la institución que lo emitió y, si te lo piden, en el ministerio que corresponda.</li>
+<li>Juntá la documentación y pedí turno en el colegio de tu distrito.</li>
+<li>Presentá todo y pagá la inscripción.</li>
+<li>En muchos colegios hay una jura o acto de entrega de matrícula. Ahí recibís tu número y credencial.</li>
+<li>Afiliate a la caja previsional profesional, si en tu provincia es obligatoria.</li>
+<li>Inscribite en los registros que vayas a usar: registro de profesionales del municipio, distribuidoras de gas o electricidad.</li>
+</ol>
+
+<h3>La caja previsional: el costo que más pesa</h3>
+<p>En muchas provincias, matricularte implica aportar a una caja de previsión profesional, con cuotas mensuales o aportes por cada trabajo. Suele ser el gasto más alto de estar matriculado. Antes de inscribirte preguntá:</p>
+<ul>
+<li>Si hay cuota reducida para recién recibidos o los primeros años.</li>
+<li>Si podés pedir suspensión o baja temporaria si no ejercés.</li>
+<li>Si los aportes por trabajo se pagan al visar los planos.</li>
+</ul>
+
+<h3>Después de matricularte</h3>
+<ul>
+<li><b>Visado:</b> muchos trabajos se presentan al colegio para visar antes de ir al municipio. El colegio controla y cobra los aportes que correspondan.</li>
+<li><b>Honorarios de referencia:</b> algunos colegios publican aranceles o valores de referencia. Sirven para cotizar y para no cobrar por debajo de lo razonable.</li>
+<li><b>Mantené la cuota al día.</b> Con deuda, la matrícula se suspende y no podés firmar.</li>
+<li><b>Seguro de responsabilidad profesional:</b> cuando empieces a dirigir obras, consideralo.</li>
+</ul>
+
+<h3>Preguntas para hacer en el colegio</h3>
+<ul class="check2">
+<li>¿Qué documentación exacta necesito y cuánto cuesta la inscripción?</li>
+<li>¿Cuál es la cuota anual y cómo funciona la caja previsional?</li>
+<li>¿Hay beneficios para recién recibidos?</li>
+<li>¿Qué trabajos se visan y cuánto cuesta el visado?</li>
+<li>¿Tienen convenio de reciprocidad con otras provincias?</li>
+<li>¿Dónde consulto las incumbencias de mi título?</li>
+</ul>
+<p class="ex">Mientras tramitás la matrícula, podés seguir trabajando en todo lo que no requiere firma: documentación, modelado, renders, cómputos. Eso también se consigue en la Red.</p>
+`},
+1:{t:"Portfolio sin experiencia",sub:"Manual 1 · Kit Primer Cliente",h:`
+<p class="lede">El cliente no busca el portfolio más grande. Busca una prueba de que sabés resolver algo parecido a lo que necesita, presentado con prolijidad. Eso se puede armar sin haber tenido un solo cliente.</p>
+
+<h3>Qué incluir</h3>
+<ul>
+<li><b>Entre 3 y 5 trabajos.</b> Tres buenos convencen más que doce flojos. El mejor va primero.</li>
+<li><b>Trabajos de facultad reelaborados.</b> Rehacé las láminas con tu presentación actual: el cliente no sabe si fue una entrega de tercer año.</li>
+<li><b>Un proyecto propio con un pedido real.</b> Inventá un cliente creíble: “vivienda para una familia de 4 en un lote de 10 × 30 m en Funes, presupuesto ajustado”. Resolvelo completo.</li>
+<li><b>Trabajos técnicos.</b> El plano eléctrico de tu casa, el relevamiento del departamento de un familiar, un cómputo. Muestran oficio.</li>
+<li><b>Lo que quieras que te pidan.</b> Si querés hacer renders, que haya renders. El portfolio atrae el trabajo que muestra.</li>
+</ul>
+
+<h3>Cómo armar cada trabajo</h3>
+<ol>
+<li>Título y una línea con el problema: “Vivienda en lote angosto con patio central”.</li>
+<li>Una imagen fuerte: el render o la vista que mejor lo explica.</li>
+<li>Planta, un corte y una fachada, legibles en el celular.</li>
+<li>Un detalle o una lámina técnica que muestre que sabés documentar.</li>
+<li>Qué hiciste vos y con qué software. En trabajos grupales, aclaralo siempre.</li>
+</ol>
+
+<h3>Un proyecto propio en dos semanas</h3>
+<div class="tbl"><table>
+<thead><tr><th>Días</th><th>Qué hacer</th></tr></thead>
+<tbody>
+<tr><td>1 y 2</td><td>Escribir el pedido del cliente ficticio, elegir lote real, juntar referencias.</td></tr>
+<tr><td>3 a 6</td><td>Implantación, plantas y una vuelta de ajustes como si te la hubieran pedido.</td></tr>
+<tr><td>7 a 9</td><td>Cortes, fachadas y modelo 3D.</td></tr>
+<tr><td>10 a 12</td><td>Dos o tres renders y una lámina técnica.</td></tr>
+<tr><td>13 y 14</td><td>Armar las láminas del portfolio y publicarlo.</td></tr>
+</tbody></table></div>
+
+<h3>Dónde publicarlo</h3>
+<ul>
+<li>Un <b>PDF liviano</b>, de menos de 10 MB, para mandar por WhatsApp.</li>
+<li>Una versión online: Behance, una carpeta pública de Drive o tu Instagram profesional.</li>
+<li>El link en tu perfil de la Red y al final de cada propuesta.</li>
+</ul>
+
+<h3>Errores frecuentes</h3>
+<ul class="errs">
+<li>Mostrar todo lo que hiciste en la facultad, sin elegir.</li>
+<li>Solo renders, sin un solo plano.</li>
+<li>No aclarar qué parte hiciste en un trabajo grupal.</li>
+<li>Links que piden permiso o no abren.</li>
+<li>Un PDF de 80 MB que nadie descarga.</li>
+</ul>
+`},
+4:{t:"El acuerdo de trabajo",sub:"Manual 4 · Kit Primer Cliente",h:`
+<p class="lede">Un acuerdo escrito no es desconfianza: es la forma de que los dos sepan qué se hace, qué no, cuándo y cuánto cuesta. Para trabajos de proyecto y documentación, una carilla enviada por mail o WhatsApp y aceptada por escrito alcanza para empezar.</p>
+
+<h3>Qué tiene que decir</h3>
+<ol>
+<li><b>Partes.</b> Tu nombre y el del cliente, con un contacto de cada uno.</li>
+<li><b>Objeto.</b> Qué se hace, en una frase: “Anteproyecto de vivienda unifamiliar en Funes, lote de 10 × 24,5 m”.</li>
+<li><b>Entregables y formatos.</b> La lista exacta: láminas, renders, PDF, DWG, modelo editable sí o no.</li>
+<li><b>Qué no incluye.</b> Cálculo estructural, instalaciones, documentación municipal, dirección de obra. Lo que no está escrito, después se discute.</li>
+<li><b>Lo que aporta el cliente.</b> Mensura, medidas, fotos, referencias. Y que los plazos corren desde que lo entrega.</li>
+<li><b>Plazos por etapa.</b> Con fechas o en días hábiles desde el anticipo.</li>
+<li><b>Revisiones.</b> Cuántas rondas incluye cada etapa y cuánto cuesta una ronda extra.</li>
+<li><b>Honorarios y pago.</b> Total, anticipo, saldo, medio de pago y validez del presupuesto. Si dura más de dos meses, cómo se ajusta.</li>
+<li><b>Archivos.</b> Durante el trabajo se entregan PDF. Los DWG y el modelo editable, con el pago final. Podés usar las imágenes en tu portfolio, salvo que el cliente pida lo contrario.</li>
+<li><b>Cancelación.</b> Si el cliente cancela, se cobra lo hecho hasta ese momento y el anticipo no se devuelve.</li>
+</ol>
+
+<h3>Texto modelo</h3>
+<div class="formula" style="font-family:var(--f-body);font-size:14px;white-space:pre-line">ACUERDO DE TRABAJO
+Entre [tu nombre] (profesional) y [nombre del cliente] (cliente).
+Objeto: [qué se hace y dónde].
+Entregables: [lista]. Formatos: PDF durante el proceso; DWG [y modelo 3D] con el pago final.
+No incluye: [lista].
+El cliente aporta: [mensura, fotos, medidas]. Los plazos corren desde que se recibe esta información y el anticipo.
+Plazo: [etapas con días hábiles].
+Revisiones: [2] rondas por etapa. Rondas adicionales: $[monto] cada una.
+Honorarios: $[total]. Anticipo [30%] al aceptar; saldo [70%] contra entrega. Validez: 15 días.
+Cancelación: se abona el trabajo realizado; el anticipo no se reintegra.
+Las imágenes podrán usarse en el portfolio del profesional, salvo pedido en contrario.
+Aceptado por el cliente: “Confirmo” por escrito en este mismo medio.</div>
+
+<h3>Cómo lograr que lo acepten</h3>
+<ul>
+<li>Mandalo junto con el pedido de anticipo, no como un trámite aparte.</li>
+<li>Pedí una respuesta escrita: “Confirmo, adelante”. Guardá la captura.</li>
+<li>Si el cliente cambia algo del acuerdo, actualizalo y volvé a pedir confirmación.</li>
+</ul>
+<p class="ex">Esta guía es orientativa y no reemplaza un contrato. Para obras, montos grandes o clientes empresa, consultá con un abogado.</p>
+`},
+5:{t:"Del primer mensaje a la entrega",sub:"Manual 5 · Kit Primer Cliente",h:`
+<p class="lede">La mayoría de los problemas con clientes no vienen del dibujo sino del proceso: algo que no se preguntó, un cambio que no quedó escrito, una entrega sin nota. Este checklist recorre el trabajo de punta a punta.</p>
+
+<h3>1. Primer contacto</h3>
+<ul class="check2">
+<li>Respondé en menos de 24 horas, aunque sea para decir cuándo lo mirás.</li>
+<li>Preguntá lo que falta antes de cotizar.</li>
+<li>Si el trabajo lo amerita, proponé una charla de 20 minutos.</li>
+</ul>
+
+<h3>2. Propuesta y acuerdo</h3>
+<ul class="check2">
+<li>Propuesta con alcance, entregables, revisiones, plazo y precio.</li>
+<li>Acuerdo de trabajo aceptado por escrito.</li>
+<li>Anticipo cobrado. Sin anticipo no se arranca.</li>
+</ul>
+
+<h3>3. Arranque</h3>
+<ul class="check2">
+<li>Recibiste toda la información del cliente. Si falta algo, los plazos no corren.</li>
+<li>Armaste la carpeta del proyecto.</li>
+<li>Le mandaste al cliente el cronograma con las fechas de cada entrega.</li>
+</ul>
+<div class="formula">CASAFUNES/
+  01_CLIENTE/      mensura, fotos, referencias
+  02_TRABAJO/      DWG y modelo en proceso
+  03_ENTREGAS/     CASAFUNES_ARQ_v01.pdf, v02…
+  04_ADMIN/        propuesta, acuerdo, recibos</div>
+
+<h3>4. Desarrollo</h3>
+<ul class="check2">
+<li>Cada entrega parcial es un PDF numerado: v01, v02, v03.</li>
+<li>Cada pedido de cambio queda por escrito, aunque lo hayan dicho en una llamada: “Te resumo lo que hablamos…”.</li>
+<li>Avisá antes si un plazo se corre. Nunca el mismo día.</li>
+</ul>
+
+<h3>5. Revisiones</h3>
+<ul class="check2">
+<li>Pedí los cambios en una sola lista por ronda, no de a uno por día.</li>
+<li>Contá las rondas en voz alta: “Esta es la segunda y última ronda incluida en esta etapa”.</li>
+</ul>
+
+<h3>6. Entrega final</h3>
+<ul class="check2">
+<li>Saldo cobrado antes de mandar los archivos editables.</li>
+<li>Nota de entrega con la lista de archivos y qué contiene cada uno.</li>
+<li>Archivos revisados: abren, imprimen bien y no tienen capas de trabajo sueltas.</li>
+</ul>
+
+<h3>7. Cierre</h3>
+<ul class="check2">
+<li>Pedí la calificación en la Red el mismo día de la entrega.</li>
+<li>Pedí permiso para mostrar el trabajo en tu portfolio.</li>
+<li>A los 30 días, un mensaje corto: “¿Cómo siguió el proyecto?”. Es el que trae el próximo trabajo.</li>
+</ul>
+`},
+6:{t:"Entregables profesionales",sub:"Manual 6 · Kit Primer Cliente",h:`
+<p class="lede">Dos profesionales pueden dibujar lo mismo y uno parecer el doble de serio que el otro. La diferencia está en el rótulo, el orden de las láminas, los nombres de archivo y un DWG que abre sin errores.</p>
+
+<h3>El rótulo</h3>
+<p>Mismo rótulo en todas las láminas, con estos datos:</p>
+<ul>
+<li>Proyecto, ubicación y cliente.</li>
+<li>Contenido de la lámina (“Planta baja”, “Corte A-A”).</li>
+<li>Número de lámina sobre el total: L03 / 08.</li>
+<li>Escala, fecha y número de revisión.</li>
+<li>Tu nombre y contacto.</li>
+</ul>
+<p class="ex">Si todavía no tenés matrícula, no pongas firma ni casillero de “profesional responsable”: poné “Dibujo y proyecto: [tu nombre]”.</p>
+
+<h3>Orden y escalas</h3>
+<div class="tbl"><table>
+<thead><tr><th>Lámina</th><th>Escala habitual</th></tr></thead>
+<tbody>
+<tr><td>Implantación</td><td>1:200 o 1:100</td></tr>
+<tr><td>Plantas</td><td>1:50 o 1:100</td></tr>
+<tr><td>Cortes y vistas</td><td>1:50 o 1:100</td></tr>
+<tr><td>Detalles</td><td>1:20, 1:10 o 1:5</td></tr>
+<tr><td>Renders y perspectivas</td><td>Sin escala, al final</td></tr>
+</tbody></table></div>
+<p>Usá el mismo formato de hoja para todo el juego. A3 para mandar y ver en pantalla; A1 si se va a imprimir para obra.</p>
+
+<h3>Líneas</h3>
+<ul>
+<li>Lo cortado, grueso. Lo visto, medio. Lo proyectado y oculto, fino o en trazos.</li>
+<li>Cotas y textos finos, con una sola tipografía y dos tamaños como máximo.</li>
+<li>Probá imprimir una lámina en blanco y negro: si se entiende, está bien.</li>
+</ul>
+
+<h3>Capas</h3>
+<p>Un prefijo por disciplina y un nombre corto. Simple y siempre igual:</p>
+<div class="formula">A-MURO   A-CARP   A-MOBI   A-COTA   A-TEXT   A-EJES
+E-BOCA   E-CIRC   E-TABL   S-AGUA   S-CLOA   G-CAÑE</div>
+
+<h3>Nombres de archivo</h3>
+<div class="formula">PROYECTO_DISCIPLINA_LAMINA_REVISION
+CASAFUNES_ARQ_L03_R01.pdf
+CASAFUNES_ELE_L01_R00.dwg</div>
+
+<h3>Antes de mandar</h3>
+<ul class="check2">
+<li>Un solo PDF con todas las láminas en orden, de menos de 20 MB.</li>
+<li>Lo abriste en el celular y se lee.</li>
+<li>DWG con purge y audit hechos, guardado en una versión compatible (2013 o 2018).</li>
+<li>Si usa referencias externas, imágenes o fuentes especiales, empaquetado con eTransmit.</li>
+<li>Nota de entrega con la lista de archivos.</li>
+</ul>
+`},
+7:{t:"Cuando el cliente se estira",sub:"Manual 7 · Kit Primer Cliente",h:`
+<p class="lede">Casi todos los clientes piden algo de más. No es mala fe: no saben cuánto trabajo lleva. Tu tarea es hacerlo visible a tiempo, con amabilidad y por escrito.</p>
+
+<h3>La regla de oro</h3>
+<div class="formula" style="font-family:var(--f-body)">Ante cualquier pedido fuera de lo acordado: “Lo hago. Lleva [X] horas y tiene un costo de $[Y]. ¿Avanzo?”</div>
+<p>Nunca lo hagas primero y lo cobres después. Nunca lo hagas gratis “por esta vez” sin decir que es por esta vez.</p>
+
+<h3>“Un cambio más”</h3>
+<p>Cuando se terminaron las rondas incluidas:</p>
+<div class="ex">“Con esta ya hicimos las dos rondas de ajustes incluidas en esta etapa. Si querés hacer otra, la sumo por $[monto]. Si preferís, juntamos todos los cambios que te queden en una sola lista y lo resolvemos en esa ronda.”</div>
+
+<h3>Pide algo que no estaba</h3>
+<div class="ex">“Buena idea. Eso no estaba en el alcance que acordamos (te lo paso abajo). Te lo cotizo aparte: son $[monto] y [días] más. ¿Lo sumamos?”</div>
+
+<h3>Cambia de idea a mitad de camino</h3>
+<p>Pasar de 3 a 4 dormitorios o sumar una planta no es un ajuste: es otro proyecto. Cerrá la etapa hecha, cobrala, y cotizá el nuevo alcance desde cero.</p>
+
+<h3>Desaparece</h3>
+<ul>
+<li>A la semana, un mensaje corto preguntando si sigue en pie.</li>
+<li>A las dos semanas: “Pongo el proyecto en pausa. Cuando quieras retomar, coordinamos nuevas fechas”.</li>
+<li>Los plazos se reprograman desde que vuelve, no desde que se fue.</li>
+</ul>
+
+<h3>No paga</h3>
+<ol>
+<li>El día del vencimiento, un recordatorio amable con el monto y los datos de pago.</li>
+<li>A los 7 días, uno más firme: “Para entregarte los archivos finales necesito el saldo”.</li>
+<li>No entregues DWG ni archivos editables hasta cobrar. Los PDF con marca de agua ya los tiene para avanzar.</li>
+<li>Si el trabajo sigue, pausalo hasta regularizar.</li>
+</ol>
+
+<h3>Cuándo cortar</h3>
+<p>Si hay faltas de respeto, o los pedidos triplican el trabajo y el cliente no acepta pagar, cerrá la relación: entregá lo hecho, cobrá lo hecho y terminá con un mensaje cordial. Perder un cliente así te libera tiempo para uno mejor.</p>
+<p class="ex">Al terminar, calificá al cliente con honestidad en la Red. Así el próximo profesional sabe con quién trabaja.</p>
+`},
+8:{t:"Facturar sin miedo",sub:"Manual 8 · Kit Primer Cliente",h:`
+<p class="lede">Facturar te permite trabajar con estudios y empresas, que casi siempre lo exigen, y te da aportes jubilatorios y obra social. Para alguien que arranca, el camino habitual es el monotributo.</p>
+
+<h3>Qué es el monotributo</h3>
+<ul>
+<li>Un régimen simplificado: pagás una <b>cuota mensual fija</b> que incluye el impuesto, el aporte jubilatorio y la obra social.</li>
+<li>La cuota depende de tu <b>categoría</b>, que se define por lo que facturás en el año.</li>
+<li>Dos veces por año, en enero y julio, revisás si tenés que cambiar de categoría.</li>
+<li>Los montos de cada categoría se actualizan seguido: consultalos siempre en el sitio de ARCA, no en guías viejas.</li>
+</ul>
+
+<h3>Los pasos</h3>
+<ol>
+<li><b>Clave fiscal nivel 3.</b> Se valida desde la app de ARCA con tu DNI.</li>
+<li><b>Alta en el monotributo</b> con la actividad que corresponda a servicios de arquitectura, ingeniería o diseño.</li>
+<li><b>Ingresos Brutos de tu provincia.</b> En varias provincias se tramita junto con el monotributo; en otras va aparte. Consultalo.</li>
+<li><b>Punto de venta</b> para factura electrónica, desde el servicio de administración de puntos de venta.</li>
+<li><b>Primera factura</b> desde “Comprobantes en línea”: como monotributista emitís Factura C.</li>
+</ol>
+
+<h3>Tu primera factura</h3>
+<ul class="check2">
+<li>Datos del cliente: nombre o razón social y CUIT (o DNI si es consumidor final).</li>
+<li>Descripción clara: “Honorarios por anteproyecto de vivienda, etapa 1 de 4”.</li>
+<li>Fecha y período del servicio.</li>
+<li>Monto total. Mandá el PDF al cliente junto con los datos de pago.</li>
+</ul>
+
+<h3>Qué preguntarle a un contador</h3>
+<ul>
+<li>En qué categoría empezar según lo que pensás facturar.</li>
+<li>Cómo funciona Ingresos Brutos si trabajás para clientes de otras provincias.</li>
+<li>Si te conviene pasar a responsable inscripto cuando crezcas.</li>
+<li>Qué hacer si cobrás desde el exterior.</li>
+</ul>
+<p class="ex">Una consulta con un contador al empezar sale mucho más barata que corregir un error de categoría después. Esta guía es orientativa y no reemplaza su asesoramiento.</p>
+`},
+2:{t:"La propuesta que gana",sub:"Manual 2 · Kit Primer Cliente",h:`
+<p class="lede">El cliente recibe varias propuestas y las mira rápido. Decide en segundos si leer la tuya completa. Para pasar ese filtro, tiene que ver cuatro cosas: que entendiste <b>su</b> proyecto, qué recibe, cuánto cuesta y cuándo lo tiene, y por qué confiar en vos.</p>
+
+<h3>Las 6 partes de una propuesta</h3>
+<ol class="steps6">
+<li><b>Saludo y quién sos.</b> Dos líneas: nombre, título y en qué te especializás. Nada de biografía.</li>
+<li><b>Lo que entendiste del proyecto.</b> Un resumen con un dato concreto de lo que publicó: el desnivel, la cantidad de cocheras, el estilo. Es lo que más diferencia tu propuesta de las genéricas.</li>
+<li><b>Cómo lo encararías.</b> Las etapas en orden, con una idea propia si la tenés. Una sola idea buena vale más que diez frases lindas.</li>
+<li><b>Qué entregás.</b> Lista concreta: láminas, cantidad de renders, formatos (PDF + DWG), si incluye el modelo editable.</li>
+<li><b>Plazo, revisiones y precio.</b> Plazo por etapa, cuántas rondas de ajustes incluye, precio total y forma de pago.</li>
+<li><b>Cierre.</b> Una pregunta o un próximo paso concreto, y el link a tu portfolio.</li>
+</ol>
+
+<h3>La misma propuesta, mal y bien</h3>
+<div class="vs">
+<div class="bad"><span class="tagx">Se descarta</span><p>Hola, soy arquitecta con mucha experiencia en diseño. Me interesa tu proyecto, lo puedo hacer en el tiempo que necesites. Mi precio es $350.000. Quedo atenta, saludos.</p><small>No menciona nada del proyecto. No dice qué entrega ni cuántas revisiones. El precio no tiene forma de pago. “En el tiempo que necesites” suena a que no planificó.</small></div>
+<div class="good"><span class="tagx">Se lee completa</span><p>Hola, soy Lucía, arquitecta recibida en 2025, trabajo anteproyectos residenciales.<br><br>Vi que el fondo del lote sube 1,50 m desde los 14 m. Propongo usar ese desnivel para la pileta y el área social, apoyadas en el muro de contención, y dejar cochera y oficina a nivel de vereda. La casa gana privacidad sin escaleras largas.<br><br>Entrego implantación, plantas, 2 cortes por el desnivel, 4 fachadas, modelo 3D y 4 renders. PDF + DWG. Incluye 2 rondas de ajustes por etapa.<br><br>Plazo: 40 días en 4 etapas. Precio: $480.000 (30% al inicio, 30% al aprobar plantas, 40% con los renders).<br><br>¿Tenés la mensura en DWG? Con eso arranco la implantación. Portfolio: [link]</p><small>Muestra que leyó, propone una idea, dice qué entrega y cómo cobra, y termina con una pregunta que invita a responder.</small></div>
+</div>
+
+<h3>10 errores que te descartan</h3>
+<ul class="errs">
+<li>Copiar y pegar la misma propuesta en todos los proyectos.</li>
+<li>Hablar más de vos que del proyecto del cliente.</li>
+<li>No decir qué entregás, o decirlo vago (“planos completos”).</li>
+<li>No poner cuántas revisiones incluye el precio.</li>
+<li>Precio sin forma de pago, o sin aclarar si es total o por etapa.</li>
+<li>Prometer plazos imposibles para ganar.</li>
+<li>Cotizar muy por debajo “para entrar”: el cliente lo lee como falta de experiencia.</li>
+<li>Textos larguísimos. Si no entra en una pantalla de celular, sobra.</li>
+<li>Errores de ortografía y mayúsculas sostenidas.</li>
+<li>No mostrar ningún trabajo. Aunque sea de facultad, mostralo.</li>
+</ul>
+
+<h3>Antes de enviar</h3>
+<ul class="check2">
+<li>Nombré algo específico del proyecto.</li>
+<li>La lista de entregables tiene cantidades y formatos.</li>
+<li>Puse revisiones incluidas, plazo y forma de pago.</li>
+<li>Termina con una pregunta o un próximo paso.</li>
+<li>Está el link al portfolio y funciona.</li>
+<li>La leí una vez en voz alta.</li>
+</ul>
+
+<h3>Después de enviar</h3>
+<p>Si el proyecto tiene preguntas abiertas, respondelas rápido: es tu mejor vidriera. Si en 3 o 4 días no hay respuesta, un único mensaje corto alcanza: “Hola, ¿pudiste ver mi propuesta? Si te sirve, te paso un boceto rápido de la implantación para que veas cómo lo encararía.” No más de uno.</p>
+`},
+3:{t:"Cuánto cobrar",sub:"Manual 3 · Kit Primer Cliente",h:`
+<p class="lede">El error más común al arrancar no es cobrar mal: es cotizar sin saber cuánto cuesta tu hora ni cuántas horas lleva el trabajo. Este manual te da un método simple para cotizar con números y defender tu precio.</p>
+
+<h3>1. Antes de cotizar, entendé el alcance</h3>
+<p>No pongas un precio hasta tener claro qué te piden. Preguntá lo que falte, en la sección de preguntas del proyecto o en la primera charla:</p>
+<ul>
+<li>¿Qué documentación ya existe? Mensura, planos viejos, fotos, relevamiento.</li>
+<li>¿Qué tiene que tener la entrega? Láminas, renders, formatos, si quiere el modelo editable.</li>
+<li>¿Para qué lo va a usar? Presentar a un banco, vender, construir, mostrar a la familia.</li>
+<li>¿Tiene fecha límite real o es una preferencia?</li>
+</ul>
+
+<h3>2. Calculá tu valor hora real</h3>
+<div class="formula">Valor hora = (gastos fijos del mes + lo que querés ganar) ÷ horas facturables del mes</div>
+<p><b>Gastos fijos:</b> software, internet, monotributo, luz de tu espacio de trabajo, la parte proporcional de tu computadora. <b>Horas facturables:</b> las que podés cobrar, no las que trabajás. Buscar clientes, responder mensajes y hacer administración también es trabajo, pero no lo cobra nadie. Para alguien que arranca, entre 80 y 100 horas facturables en un mes de 160 es realista.</p>
+<p class="ex">Ejemplo: $350.000 de gastos + $1.200.000 que querés ganar = $1.550.000 ÷ 100 horas = <b>$15.500 por hora</b>. Usá la calculadora de esta página con tus números.</p>
+
+<h3>3. Elegí cómo cobrar</h3>
+<div class="tbl"><table>
+<thead><tr><th>Forma</th><th>Cuándo conviene</th><th>Cuidado con</th></tr></thead>
+<tbody>
+<tr><td><b>Precio cerrado por entregable</b></td><td>La mayoría de los primeros trabajos: anteproyecto, renders, planos de instalación. El cliente sabe cuánto paga.</td><td>Definir bien el alcance y las revisiones, o el precio cerrado se vuelve infinito.</td></tr>
+<tr><td><b>Por m²</b></td><td>Proyectos de vivienda o documentación donde el tamaño manda. Es lo que el cliente entiende rápido.</td><td>Superficies chicas o muy complejas: poné un mínimo. Un baño de 6 m² puede llevar más horas que un living de 40.</td></tr>
+<tr><td><b>Por hora</b></td><td>Trabajos sin alcance claro: asesoramiento, cambios sobre un proyecto ajeno, relevamientos con imprevistos.</td><td>Al cliente le da inseguridad. Dale una estimación de horas y avisá antes de pasarte.</td></tr>
+</tbody></table></div>
+
+<h3>4. Estimá las horas por etapa</h3>
+<p>Partí el trabajo en etapas y estimá cada una. Ejemplo para un anteproyecto de vivienda de 120 m² con 4 renders:</p>
+<div class="tbl"><table class="num">
+<thead><tr><th>Etapa</th><th>Horas</th></tr></thead>
+<tbody>
+<tr><td>Lectura de la información e implantación</td><td>4</td></tr>
+<tr><td>Plantas</td><td>12</td></tr>
+<tr><td>Ajustes de plantas (2 rondas)</td><td>8</td></tr>
+<tr><td>Cortes y fachadas</td><td>8</td></tr>
+<tr><td>Modelo 3D</td><td>10</td></tr>
+<tr><td>Renders</td><td>8</td></tr>
+<tr><td>Láminas y entrega</td><td>4</td></tr>
+<tr class="tot"><td>Total</td><td>54</td></tr>
+</tbody></table></div>
+<p class="ex">54 horas × $15.500 = $837.000. Más 20% por imprevistos = <b>$1.004.400</b>. Si el mercado para ese trabajo está por debajo, no bajes el precio: reducí el alcance (menos renders, sin modelo editable) o revisá si tus horas estimadas son realistas.</p>
+<p>Anotá las horas reales de cada trabajo que hagas. Después de tres o cuatro proyectos, tus estimaciones van a ser mucho más precisas.</p>
+
+<h3>5. Revisiones y adicionales</h3>
+<ul>
+<li>Incluí <b>2 rondas de ajustes por etapa</b> y escribilo en la propuesta.</li>
+<li>Una ronda extra se cobra a valor hora. Avisalo antes de hacerla, no después.</li>
+<li>Cambiar el programa (de 3 a 4 dormitorios, sumar una planta) no es un ajuste: es un presupuesto nuevo.</li>
+</ul>
+
+<h3>6. Anticipo y forma de pago</h3>
+<ul>
+<li>Nunca empieces sin anticipo. Lo habitual es <b>30% al inicio y 70% contra entrega</b>, o en trabajos largos 30 / 30 / 40 por etapas.</li>
+<li>Durante el proceso mandá PDF. El DWG editable y los archivos finales se entregan con el pago final.</li>
+<li>Poné <b>validez al presupuesto</b>: 15 días. Con inflación, un precio sin fecha es un riesgo tuyo.</li>
+<li>En trabajos de más de dos meses, aclará que el saldo se ajusta por índice (por ejemplo, el CAC) si se demora por causas del cliente.</li>
+</ul>
+
+<h3>7. Cuando te dicen “está caro”</h3>
+<p>No bajes el precio, bajá el alcance. Respondé algo así: “Entiendo. Para llegar a ese número puedo sacar dos renders y entregarte solo PDF. Así el precio queda en $X. ¿Te sirve?” El cliente elige qué resignar y vos no regalás tu hora.</p>
+
+<h3>Errores que te hacen perder plata</h3>
+<ul class="errs">
+<li>Cobrar lo que cobra otro sin saber cuánto te cuesta a vos.</li>
+<li>No contar las revisiones ni las reuniones.</li>
+<li>Bajar el precio por ansiedad antes de que el cliente lo pida.</li>
+<li>Trabajar sin anticipo “porque parece buena persona”.</li>
+<li>Entregar el DWG antes de cobrar el total.</li>
+</ul>
+`}
+};
+function openManual(n){
+  const m=MANUALES[n];
+  if(!m){toast("Este manual está en preparación");return;}
+  $("#dlbody").innerHTML=`<div class="dlhead"><div><div class="eyebrow">${esc(m.sub)}</div><h2 id="dl-title" style="margin-top:4px">${esc(m.t)}</h2></div><button class="x" id="x" aria-label="Cerrar">✕</button></div><article class="reader">${m.h}</article><div class="inline"><button class="btn o" id="x2">Cerrar</button>${n===3?'<button class="btn y" id="gocalc">Ir a la calculadora</button>':""}</div>`;
+  $("#x").onclick=$("#x2").onclick=()=>$("#dlg").close();
+  if($("#gocalc"))$("#gocalc").onclick=()=>{$("#dlg").close();$("#calc").scrollIntoView();};
+  if(!$("#dlg").open)$("#dlg").showModal();
+  $("#dlg").scrollTop=0;
+}
+document.querySelectorAll(".man").forEach((m,i)=>{
+  const n=i+1;m.tabIndex=0;m.setAttribute("role","button");
+  const tag=document.createElement("span");tag.className="manst"+(MANUALES[n]?" ready":"");tag.textContent=MANUALES[n]?"Leer":"En preparación";
+  m.querySelector("div").appendChild(tag);
+  m.onclick=()=>openManual(n);m.onkeydown=e=>{if(e.key==="Enter")openManual(n);};
+});
+
+/* ===== Revisión de propuestas: profesional ↔ Proyecta Más ===== */
+const NOTAS_RAPIDAS=[
+ ["Agregar","Mencioná algo específico del proyecto (medidas, desnivel, estilo) para que se note que lo leíste."],
+ ["Agregar","Detallá los entregables con cantidades y formatos (láminas, renders, PDF + DWG)."],
+ ["Agregar","Aclarar cuántas rondas de revisión incluye el precio."],
+ ["Agregar","Sumá la forma de pago: anticipo y saldo."],
+ ["Corregir","El plazo es muy corto para el alcance. Dividilo por etapas."],
+ ["Corregir","El precio está bajo para lo que entregás. Revisalo con la calculadora."],
+ ["Sacar","Sacá la parte sobre tu experiencia general; enfocate en este proyecto."],
+ ["Agregar","Agregá el link a tu portfolio."]
+];
+let revs=[
+ {id:"r1",ej:true,mine:false,pro:"Camila P.",titulo:"Anteproyecto de vivienda con oficina y pileta en terreno con desnivel",pid:1,precio:"$300.000",plazo:"15 días",estado:"revision",notas:[],gral:"",
+  txt:"Hola! Soy Camila, arquitecta recién recibida y me encanta el diseño contemporáneo. Tengo mucha experiencia con SketchUp y Lumion. Puedo hacer tu proyecto en 15 días. El precio es $300.000. Espero tu respuesta!"},
+ {id:"r2",ej:true,mine:false,pro:"Joaquín S.",titulo:"Relevamiento y plano para regularizar quincho y garaje",pid:5,precio:"$260.000",plazo:"10 días",estado:"revision",notas:[],gral:"",
+  txt:"Hola, soy Joaquín, MMO, vivo en Mar del Plata y puedo ir a medir esta semana.\n\nHago el relevamiento del quincho y el garaje, y te armo los planos de regularización según lo que pide el municipio.\n\nPlazo: 10 días. Precio: $260.000."}
+];
+let curRev=null;
+
+function revPill(e){return e==="revision"?'<span class="pill none">En revisión</span>':e==="correcciones"?'<span class="pill first">Con correcciones</span>':'<span class="pill open">Enviada al cliente</span>';}
+function notaHTML(n,i,del){return`<li class="nota"><span class="nt nt-${n.tipo.toLowerCase()}">${n.tipo}</span><span>${esc(n.txt)}</span>${del?`<button type="button" class="x sm" data-del="${i}" aria-label="Quitar">✕</button>`:""}</li>`;}
+
+function drawPanel(){
+  const pend=revs.filter(r=>r.estado==="revision");
+  $("#pcount").textContent=pend.length;
+  $("#plist").innerHTML=revs.map(r=>`<button type="button" class="prow ${curRev===r.id?"on":""}" data-r="${r.id}"><b>${esc(r.pro)}</b>${r.ej?'<span class="pill">EJEMPLO</span>':""}<span>${esc(r.titulo)}</span>${revPill(r.estado)}</button>`).join("")||'<div class="empty">No hay propuestas para revisar.</div>';
+  $("#plist").querySelectorAll(".prow").forEach(b=>b.onclick=()=>{curRev=b.dataset.r;drawPanel();});
+  const r=revs.find(x=>x.id===curRev);
+  if(!r){$("#pdetail").innerHTML='<div class="empty">Elegí una propuesta de la lista para revisarla.</div>';return;}
+  const done=r.estado!=="revision";
+  $("#pdetail").innerHTML=`
+   <div class="meta">${revPill(r.estado)}<span>Recibida para revisión · responder en 24 h hábiles</span></div>
+   <h3 class="ptitle">${esc(r.pro)} → ${esc(r.titulo)}</h3>
+   <div class="propnums"><span>Precio ${esc(r.precio)}</span><span>Plazo ${esc(r.plazo)}</span><button type="button" class="btn o sm" id="verproy">Ver el proyecto</button></div>
+   <pre class="ptext">${esc(r.txt)}</pre>
+   <div><h4 class="h4b">Correcciones (${r.notas.length})</h4><ul class="notas">${r.notas.map((n,i)=>notaHTML(n,i,!done)).join("")||'<li class="fine">Todavía no agregaste correcciones.</li>'}</ul></div>
+   ${done?`<div class="note">${r.estado==="correcciones"?"Devuelta con correcciones. Le avisamos al profesional por WhatsApp y mail.":"Aprobada y enviada al cliente."}</div>`:`
+   <div><h4 class="h4b">Correcciones rápidas</h4><div class="quick">${NOTAS_RAPIDAS.map((q,i)=>`<button type="button" class="qbtn" data-q="${i}"><span class="nt nt-${q[0].toLowerCase()}">${q[0]}</span>${esc(q[1])}</button>`).join("")}</div></div>
+   <div><h4 class="h4b">Corrección propia</h4><div class="inline"><select id="ntipo" style="width:auto"><option>Corregir</option><option>Agregar</option><option>Sacar</option></select><input id="ntxt" placeholder="Ej.: en el corte, explicá cómo resolvés el muro de contención"><button type="button" class="btn o sm" id="nadd">Agregar</button></div></div>
+   <label class="f">Comentario general <small>Opcional. Lo lee primero.</small><textarea id="ngral" style="min-height:80px" placeholder="Buena base. Con estos cambios queda mucho más clara.">${esc(r.gral)}</textarea></label>
+   <div class="inline"><button type="button" class="btn y" id="ndev">Devolver con correcciones</button><button type="button" class="btn" id="napr">Aprobar y enviar al cliente</button></div>`}`;
+  $("#verproy").onclick=()=>openP(r.pid);
+  if(done)return;
+  $("#pdetail").querySelectorAll("[data-del]").forEach(b=>b.onclick=()=>{r.notas.splice(+b.dataset.del,1);r.gral=$("#ngral").value;drawPanel();});
+  $("#pdetail").querySelectorAll("[data-q]").forEach(b=>b.onclick=()=>{const q=NOTAS_RAPIDAS[+b.dataset.q];r.notas.push({tipo:q[0],txt:q[1]});r.gral=$("#ngral").value;drawPanel();});
+  $("#nadd").onclick=()=>{const t=$("#ntxt").value.trim();if(!t)return;r.notas.push({tipo:$("#ntipo").value,txt:t});r.gral=$("#ngral").value;drawPanel();};
+  $("#ndev").onclick=()=>{if(!r.notas.length){toast("Agregá al menos una corrección");return;}r.gral=$("#ngral").value.trim();r.estado="correcciones";drawPanel();drawMis();toast(`Devuelta. Le avisamos a ${r.pro} por WhatsApp`);};
+  $("#napr").onclick=()=>{r.gral=$("#ngral").value.trim();r.estado="enviada";const p=projects.find(x=>x.id===r.pid);if(p&&p.props<p.max)p.props++;render();drawPanel();drawMis();toast("Aprobada y enviada al cliente");};
+}
+
+function drawMis(){
+  const mine=revs.filter(r=>r.mine);
+  $("#mislist").innerHTML=mine.length?mine.map(r=>`
+   <article class="mis">
+    <div class="meta">${revPill(r.estado)}<span>${esc(r.titulo)}</span></div>
+    ${r.estado==="revision"?`<p class="fine" style="margin:0">Proyecta Más la está leyendo. Te avisamos por WhatsApp y mail cuando tengas la devolución (24 h hábiles).</p><pre class="ptext">${esc(r.txt)}</pre>`:""}
+    ${r.estado==="correcciones"?`
+      ${r.gral?`<div class="note"><b>Comentario de Proyecta Más:</b> ${esc(r.gral)}</div>`:""}
+      <ul class="notas">${r.notas.map((n,i)=>notaHTML(n,i,false)).join("")}</ul>
+      <label class="f">Tu propuesta <small>Corregila y enviala al cliente</small><textarea data-edit="${r.id}" style="min-height:160px">${esc(r.txt)}</textarea></label>
+      <div class="row"><label class="f">Precio<input data-precio="${r.id}" value="${esc(r.precio)}"></label><label class="f">Plazo<input data-plazo="${r.id}" value="${esc(r.plazo)}"></label></div>
+      <div><button type="button" class="btn y" data-send="${r.id}">Enviar al cliente</button></div>`:""}
+    ${r.estado==="enviada"?`<p class="fine" style="margin:0">Ya la tiene el cliente. Si la acepta, te llegan sus datos de contacto.</p>`:""}
+   </article>`).join(""):'<div class="empty">Todavía no enviaste propuestas. Abrí un proyecto del tablero para empezar.</div>';
+  $("#mislist").querySelectorAll("[data-send]").forEach(b=>b.onclick=()=>{
+    const r=revs.find(x=>x.id===b.dataset.send);
+    r.txt=$(`[data-edit="${r.id}"]`).value;r.precio=$(`[data-precio="${r.id}"]`).value;r.plazo=$(`[data-plazo="${r.id}"]`).value;r.estado="enviada";
+    const p=projects.find(x=>x.id===r.pid);if(p&&p.props<p.max)p.props++;render();drawMis();toast("Propuesta enviada al cliente");});
+}
+$("#goadmin").onclick=()=>{show("panel");drawPanel();};
+drawMis();
+
+
+/* ===== Opinión después de proponer o publicar ===== */
+const SUG=["Chat con el cliente dentro de la Red","Más proyectos de mi zona","Avisos por WhatsApp","App para el celular","Más plantillas y manuales","Ver el perfil completo del cliente"];
+let opiniones=[
+ {ej:true,quien:"Profesional",accion:"propuesta",st:5,txt:"Me sirvió mucho ver la propuesta de ejemplo antes de escribir la mía.",tags:["Avisos por WhatsApp"]},
+ {ej:true,quien:"Particular",accion:"publicación",st:4,txt:"Fácil de publicar. Agregaría poder subir el plano del terreno.",tags:["Ver el perfil completo del cliente"]}
+];
+let fbDone={};
+function askFeedback(accion){
+  if(fbDone[accion])return;
+  const f={st:0,tags:[]};
+  const draw=()=>{
+    $("#fbbody").innerHTML=`<div class="dlhead"><div><div class="eyebrow">Tu opinión nos ayuda a mejorar</div><h2 id="fb-title" style="margin-top:4px">¿Qué te pareció?</h2></div><button class="x" id="fbx" aria-label="Cerrar">✕</button></div>
+     <p style="margin:0;color:var(--muted)">Acabás de ${accion==="propuesta"?"enviar una propuesta":"publicar un proyecto"}. Contanos cómo te resultó, toma 20 segundos.</p>
+     <div class="bigstars" role="radiogroup" aria-label="Puntaje">${[1,2,3,4,5].map(n=>`<button type="button" data-st="${n}" class="${f.st>=n?"on":""}" aria-label="${n} de 5">★</button>`).join("")}</div>
+     <div><h4 class="h4b">¿Qué agregarías?</h4><div class="sugs">${SUG.map(t=>`<button type="button" class="sug ${f.tags.includes(t)?"on":""}" data-sug="${esc(t)}">${esc(t)}</button>`).join("")}</div></div>
+     <label class="f">Comentario <small>Opcional</small><textarea id="fbtxt" style="min-height:80px" placeholder="Me gustaría poder…">${esc(f.txt||"")}</textarea></label>
+     <div class="inline"><button type="button" class="btn y" id="fbsend" ${f.st?"":"disabled"}>${f.st?"Enviar opinión":"Elegí las estrellas"}</button><button type="button" class="btn o" id="fbno">Ahora no</button></div>`;
+    $("#fbx").onclick=$("#fbno").onclick=()=>$("#fb").close();
+    $("#fbbody").querySelectorAll("[data-st]").forEach(b=>b.onclick=()=>{f.st=+b.dataset.st;f.txt=$("#fbtxt").value;draw();});
+    $("#fbbody").querySelectorAll("[data-sug]").forEach(b=>b.onclick=()=>{const t=b.dataset.sug;f.tags=f.tags.includes(t)?f.tags.filter(x=>x!==t):[...f.tags,t];f.txt=$("#fbtxt").value;draw();});
+    $("#fbsend").onclick=()=>{if(!f.st){toast("Elegí de 1 a 5 estrellas");return;}
+      opiniones.unshift({quien:isPro?"Profesional":"Quien publica",accion,st:f.st,txt:$("#fbtxt").value.trim(),tags:f.tags});
+      fbDone[accion]=true;$("#fb").close();drawOpiniones();toast("¡Gracias por tu opinión!");};
+  };
+  draw();
+  setTimeout(()=>{if(!$("#fb").open)$("#fb").showModal();},500);
+}
+function drawOpiniones(){
+  const avg=opiniones.reduce((a,o)=>a+o.st,0)/(opiniones.length||1);
+  $("#opavg").textContent=opiniones.length?`${String(avg.toFixed(1)).replace(".",",")} ★ promedio · ${opiniones.length} opiniones`:"";
+  const count={};opiniones.forEach(o=>o.tags.forEach(t=>count[t]=(count[t]||0)+1));
+  const top=Object.entries(count).sort((a,b)=>b[1]-a[1]);
+  $("#oplist").innerHTML=(top.length?`<div class="toptags"><b>Lo más pedido:</b> ${top.map(([t,n])=>`<span class="pill">${esc(t)} · ${n}</span>`).join("")}</div>`:"")+
+   opiniones.map(o=>`<div class="opi"><span class="rep"><span class="st">${stars(o.st)}</span> ${esc(o.quien)} · después de ${esc(o.accion)} ${o.ej?'<span class="pill">EJEMPLO</span>':""}</span>${o.txt?`<span>“${esc(o.txt)}”</span>`:""}</div>`).join("");
+}
+drawOpiniones();
+
+/* Fondo: puntos que forman obras icónicas de la arquitectura y van cambiando */
+(function(){
+  const cv=$("#bg"),ctx=cv.getContext("2d"),hero=cv.parentElement;
+  const still=matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const S=220,N=1100,STEP=7;
+  const off=document.createElement("canvas");off.width=S;off.height=S;
+  const o=off.getContext("2d",{willReadFrequently:true});
+  const poly=pts=>{o.beginPath();pts.forEach(([x,y],i)=>i?o.lineTo(x*S,y*S):o.moveTo(x*S,y*S));o.closePath();o.fill();};
+  const rect=(x,y,w,h)=>o.fillRect(x*S,y*S,w*S,h*S);
+  const ell=(x,y,rx,ry)=>{o.beginPath();o.ellipse(x*S,y*S,rx*S,ry*S,0,0,Math.PI*2);o.fill();};
+  const arch=(x,y,w,h)=>{o.beginPath();o.moveTo(x*S,(y+h)*S);o.lineTo(x*S,(y+w/2)*S);o.arc((x+w/2)*S,(y+w/2)*S,w/2*S,Math.PI,0);o.lineTo((x+w)*S,(y+h)*S);o.closePath();o.fill();};
+  const cut=f=>{o.globalCompositeOperation="destination-out";f();o.globalCompositeOperation="source-over";};
+  const OBRAS=[
+    {n:"Obelisco · Buenos Aires · Alberto Prebisch, 1936",d(){rect(.36,.96,.28,.04);poly([[.44,.97],[.46,.1],[.5,.02],[.54,.1],[.56,.97]]);cut(()=>rect(.488,.2,.024,.03));}},
+    {n:"Torre Eiffel · París · 1889",d(){o.beginPath();o.moveTo(.12*S,S);o.lineTo(.40*S,.62*S);o.lineTo(.46*S,.30*S);o.lineTo(.49*S,.06*S);o.lineTo(.5*S,0);o.lineTo(.51*S,.06*S);o.lineTo(.54*S,.30*S);o.lineTo(.60*S,.62*S);o.lineTo(.88*S,S);o.lineTo(.68*S,S);o.quadraticCurveTo(.5*S,.70*S,.32*S,S);o.closePath();o.fill();rect(.33,.6,.34,.035);rect(.43,.29,.14,.03);cut(()=>poly([[.485,.34],[.515,.34],[.54,.58],[.46,.58]]));}},
+    {n:"Coliseo · Roma · año 80",d(){poly([[0,1],[0,.3],[.5,.28],[.62,.33],[.72,.45],[.85,.5],[1,.56],[1,1]]);cut(()=>{[.36,.57,.78].forEach(r=>{for(let i=0;i<10;i++)arch(.025+i*.098,r,.056,.14);rect(0,r-.02,1,.008);});});}},
+    {n:"Taj Mahal · Agra · 1653",d(){rect(.2,.6,.6,.4);ell(.5,.44,.17,.2);rect(.36,.44,.28,.17);rect(.494,.15,.012,.1);ell(.3,.56,.06,.06);ell(.7,.56,.06,.06);rect(.04,.36,.04,.64);rect(.92,.36,.04,.64);ell(.06,.35,.035,.035);ell(.94,.35,.035,.035);cut(()=>{arch(.43,.67,.14,.33);arch(.25,.72,.08,.15);arch(.67,.72,.08,.15);});}},
+    {n:"Ópera de Sídney · Jørn Utzon, 1973",d(){rect(.04,.8,.92,.2);[[.1,.4,.32,.4],[.28,.56,.48,.28],[.46,.7,.6,.42],[.62,.9,.8,.54]].forEach(([a,b,px,py])=>{o.beginPath();o.moveTo(a*S,.81*S);o.quadraticCurveTo((a+(px-a)*.15)*S,py*S,px*S,py*S);o.lineTo(b*S,.81*S);o.closePath();o.fill();});}},
+    {n:"Torre de Pisa · 1372",d(){rect(.3,.97,.4,.03);o.save();o.translate(.5*S,.97*S);o.rotate(.08);o.fillRect(-.1*S,-.8*S,.2*S,.8*S);o.fillRect(-.075*S,-.93*S,.15*S,.14*S);
+      o.globalCompositeOperation="destination-out";for(let k=1;k<=7;k++){const y=-k*.11*S;o.fillRect(-.1*S,y,.2*S,.008*S);for(let j=0;j<5;j++)o.fillRect((-.088+j*.04)*S,y+.02*S,.016*S,.065*S);}o.globalCompositeOperation="source-over";o.restore();}}
+  ];
+  function sample(ob){
+    o.clearRect(0,0,S,S);o.fillStyle="#000";ob.d();
+    const data=o.getImageData(0,0,S,S).data,pts=[];
+    for(let y=0;y<S;y+=2)for(let x=0;x<S;x+=2)if(data[(y*S+x)*4+3]>120)pts.push([x/S,y/S]);
+    for(let i=pts.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[pts[i],pts[j]]=[pts[j],pts[i]];}
+    return pts;
+  }
+  const shapes=OBRAS.map(sample);
+  let W=0,H=0,F=0,cx=0,top=0,idx=0,label=OBRAS[0].n,labelA=0;
+  const parts=Array.from({length:N},()=>({x:Math.random(),y:Math.random(),tx:0,ty:0,y2:Math.random()<.12,ph:Math.random()*6.28}));
+  function size(){const d=Math.min(devicePixelRatio||1,2),r=hero.getBoundingClientRect();W=r.width;H=r.height;cv.width=W*d;cv.height=H*d;ctx.setTransform(d,0,0,d,0,0);
+    F=Math.min(H*.82,W>860?W*.5:W*.85);cx=W>860?W*.6:W/2;top=H-F-H*.08;}
+  function target(i){const pts=shapes[i];parts.forEach((p,k)=>{const q=pts[k%pts.length];p.tx=q[0]+(Math.random()-.5)*.006;p.ty=q[1]+(Math.random()-.5)*.006;});label=OBRAS[i].n;labelA=0;}
+  function paint(t){
+    ctx.clearRect(0,0,W,H);
+    for(const p of parts){
+      const x=cx-F/2+p.x*F,y=top+p.y*F,tw=still?0:.08*Math.sin(t*2+p.ph);
+      ctx.globalAlpha=(p.y2?.55:.34)+tw;ctx.fillStyle=p.y2?"#e0c400":"#1e4982";
+      ctx.fillRect(x,y,p.y2?2.2:1.8,p.y2?2.2:1.8);
+    }
+    ctx.globalAlpha=.6*labelA;ctx.fillStyle="#1e4982";ctx.font="500 12px 'IBM Plex Mono',monospace";ctx.textAlign="center";
+    ctx.fillText(label,cx,Math.min(H-10,top+F+22));ctx.globalAlpha=1;
+  }
+  size();target(0);
+  if(still){parts.forEach(p=>{p.x=p.tx;p.y=p.ty;});labelA=1;paint(0);addEventListener("resize",()=>{size();paint(0);});return;}
+  addEventListener("resize",size);
+  let last=performance.now(),clock=0;
+  function frame(now){
+    const dt=Math.min(.05,(now-last)/1000);last=now;clock+=dt;
+    if(clock>STEP){clock=0;idx=(idx+1)%OBRAS.length;target(idx);}
+    const k=1-Math.pow(.03,dt);
+    for(const p of parts){p.x+=(p.tx-p.x)*k;p.y+=(p.ty-p.y)*k;}
+    labelA=Math.min(1,labelA+dt*.6);
+    paint(now/1000);
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
+
+</script>
+
+</body>
+</html>
