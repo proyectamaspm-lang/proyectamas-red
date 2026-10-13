@@ -5,7 +5,7 @@ import { createClient } from "npm:@supabase/supabase-js@2.45.4";
 
 const SITIO = "https://red.proyectamas.com.ar";
 const ADMIN = "hola@proyectamas.com.ar";
-const DESDE = "Red Proyecta Más <red@proyectamas.com.ar>";
+const DESDE = "Red Proyecta Más <hola@proyectamas.com.ar>";
 
 const esc = (s: unknown) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]!));
 const waLink = (n: string) => {
