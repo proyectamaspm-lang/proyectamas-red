@@ -4,6 +4,8 @@
 
 const SB_URL = "https://juruidkvovpydbsnfnwk.supabase.co";
 const SB_KEY = "sb_publishable_cJUGcGyuJVlR8OpRs2lPgw_pLqR9txk";
+const LINK_ERR = (() => { const h = new URLSearchParams(location.hash.slice(1)); return h.get("error_code") || h.get("error") ? { code: h.get("error_code") || h.get("error"), desc: h.get("error_description") || "" } : null; })();
+if (LINK_ERR) history.replaceState(null, "", location.pathname);
 const sb = supabase.createClient(SB_URL, SB_KEY);
 
 const WA_NUM = "5493425104877", WA_SHOW = "+54 9 342 510-4877";
@@ -144,10 +146,28 @@ function abrirIngreso(msg) {
           await q(sb.auth.resetPasswordForEmail($("#l-email").value.trim(), { redirectTo: location.origin + location.pathname }));
           draw("in", `<div class="okbox">Si hay una cuenta con ese email, te llega un link para elegir una contraseña nueva.</div>`);
         }
-      } catch (er) { $("#lerr").textContent = errMsg(er); $("#lerr").hidden = false; busy(b, false); }
+      } catch (er) {
+        $("#lerr").innerHTML = esc(errMsg(er)) + (/not confirmed/i.test(er?.message || "") ? ` <button type="button" class="linkbtn" id="lresend">Mandarme otro link de activación</button>` : "");
+        $("#lerr").hidden = false; busy(b, false);
+        if ($("#lresend")) $("#lresend").onclick = () => reenviarActivacion($("#l-email").value.trim());
+      }
     };
   };
   draw();
+}
+function reenviarActivacion(emailPrevio, titulo) {
+  dialogo(`<div class="dlhead"><div><div class="eyebrow">Activar cuenta</div><h2 id="auth-title" style="margin-top:4px">${titulo || "Te mandamos otro link"}</h2></div>${cerrarX}</div>
+    <p style="margin:0">Escribí tu email y te mandamos un link nuevo para activar la cuenta. Usá siempre el <b>último</b> mail que te llegue. Si ya la activaste, <button type="button" class="linkbtn" id="rs-in">ingresá directamente</button>.</p>
+    <form id="rsf" class="authf"><label class="f">Email<input type="email" id="rs-email" required autocomplete="email" value="${esc(emailPrevio || "")}"></label>
+    <div class="formerr" id="rserr" hidden></div><button class="btn" type="submit">Mandarme el link</button></form>`, "auth");
+  $("#rs-in").onclick = () => abrirIngreso();
+  $("#rsf").onsubmit = async e => {
+    e.preventDefault(); const b = $("#rsf button"); busy(b, true, "Enviando…"); $("#rserr").hidden = true;
+    try {
+      await q(sb.auth.resend({ type: "signup", email: $("#rs-email").value.trim(), options: { emailRedirectTo: location.origin + location.pathname } }));
+      $("#rsf").outerHTML = `<div class="okbox">Listo. Revisá tu correo (y la carpeta de spam) y tocá el botón del mail más nuevo.</div>`;
+    } catch (er) { $("#rserr").textContent = errMsg(er); $("#rserr").hidden = false; busy(b, false); }
+  };
 }
 function nuevaClave() {
   dialogo(`<div class="dlhead"><div><h2 id="auth-title">Elegí tu contraseña nueva</h2></div>${cerrarX}</div>
@@ -990,6 +1010,7 @@ function agendaSiPro() { if (!esPro()) return; agenda(); if (!estMain) { estMain
   uidPrevio = S.user?.id || null; listo = true;
   await cargarProyectos();
   router();
-  tutoAuto();
+  if (LINK_ERR && !S.user) reenviarActivacion("", /expired|invalid/i.test(LINK_ERR.code + LINK_ERR.desc) ? "Ese link ya venció o ya se usó" : "No pudimos activar la cuenta con ese link");
+  else tutoAuto();
   agendaSiPro();
 })();
