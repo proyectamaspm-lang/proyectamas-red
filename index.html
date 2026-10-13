@@ -367,6 +367,8 @@ dialog::backdrop{background:rgba(18,46,84,.5)}
 .rlist{display:grid;gap:10px}
 .prop.desc{opacity:.55}
 @media (max-width:520px){.roles{grid-template-columns:1fr}}
+.launch{background:var(--yellow);color:var(--ink);font-size:14px;text-align:center;padding:6px 16px}
+.launch .linkbtn{color:var(--ink);font-weight:700}
 .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 18px;border-radius:999px;font-weight:600;font-size:14px;z-index:30;box-shadow:0 6px 20px rgba(18,46,84,.25)}
 footer{border-top:1px solid var(--line);background:var(--surface);padding-block:22px;font-size:14px;color:var(--muted)}
 footer .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
@@ -412,6 +414,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
       <span class="pro-only memberchip" hidden><span id="mname">Profesional</span> · Nivel 1 <button type="button" id="logout">Salir</button></span>
     </nav>
   </div>
+  <div class="launch">Lanzamiento · Estamos sumando los primeros profesionales y proyectos. <button type="button" class="linkbtn" id="launchcta">Anotate en la lista de espera</button></div>
 </header>
 
 <main>
@@ -1787,6 +1790,109 @@ function drawOpiniones(){
 drawOpiniones();
 
 render();setUser(null);
+
+/* ===== Lista de espera (lanzamiento) =====
+   Mientras se termina la versión con cuentas reales, publicar y registrarse anotan a la persona
+   en la lista de espera de Supabase. El admin sigue entrando con #admin en la dirección. */
+const LISTA_ESPERA=true;
+const SB_URL="https://juruidkvovpydbsnfnwk.supabase.co",SB_KEY="sb_publishable_cJUGcGyuJVlR8OpRs2lPgw_pLqR9txk";
+const esAdmin=()=>user&&user.rol==="admin";
+let waitDone={};
+
+function openWaitlist(tipo,extra){
+  const st={tipo,enviando:false,ok:false,err:""};
+  const provOpts=PROVS.map(p=>`<option ${p==="Santa Fe"?"selected":""}>${esc(p)}</option>`).join("");
+  const draw=()=>{
+    if(st.ok){
+      const msg=st.tipo==="profesional"
+        ?`Hola, me anoté como profesional en la Red Proyecta Más. Soy ${st.nombre}.`
+        :`Hola, me anoté en la Red Proyecta Más para publicar un proyecto. Soy ${st.nombre}.`;
+      $("#authbody").innerHTML=`<div class="dlhead"><div><div class="eyebrow">Lista de espera</div><h2 id="auth-title" style="margin-top:4px">¡Listo, ${esc(st.nombre.split(" ")[0])}!</h2></div><button class="x" id="ax" aria-label="Cerrar">✕</button></div>
+        <p style="margin:0">${st.tipo==="profesional"
+          ?"Quedaste anotado/a como profesional. Te avisamos por mail y WhatsApp apenas abra la Red, con acceso a los primeros proyectos."
+          :"Recibimos tu pedido. Apenas abra la Red lo publicamos y te avisamos cuando empiecen a llegar propuestas."}</p>
+        <div class="note">Si querés adelantar algo, escribinos por WhatsApp al ${esc(WA_SHOW)}.</div>
+        <div class="inline"><a class="btn wa" target="_blank" rel="noopener" href="${waLink(msg)}">Escribir por WhatsApp</a><button type="button" class="btn o" id="wclose">Seguir viendo la Red</button></div>`;
+      $("#ax").onclick=$("#wclose").onclick=()=>$("#auth").close();
+      return;
+    }
+    const pro=st.tipo==="profesional";
+    $("#authbody").innerHTML=`<div class="dlhead"><div><div class="eyebrow">Lanzamiento · Lista de espera</div><h2 id="auth-title" style="margin-top:4px">${pro?"Sumate como profesional":"Contanos qué necesitás"}</h2></div><button class="x" id="ax" aria-label="Cerrar">✕</button></div>
+      <div class="roles">
+        <button type="button" class="role ${pro?"on":""}" data-t="profesional"><b>Soy profesional</b><span>Quiero recibir proyectos</span></button>
+        <button type="button" class="role ${!pro?"on":""}" data-t="publica"><b>Quiero publicar un proyecto</b><span>Particular, estudio o empresa</span></button></div>
+      <p class="fine" style="margin:0">Estamos sumando los primeros profesionales y proyectos. Anotate y te avisamos apenas abra la Red.</p>
+      <form id="wf" class="authf" novalidate>
+        ${pro?"":`<div class="choice">${["Particular","Estudio","Empresa"].map(t=>`<label><input type="radio" name="w-tp" value="${t}" ${t==="Particular"?"checked":""}> ${t}</label>`).join("")}</div>`}
+        <div class="row"><label class="f">${pro?"Nombre y apellido":"Nombre o razón social"}<input id="w-nombre" required maxlength="120" autocomplete="name"></label>
+          <label class="f">Email<input id="w-email" type="email" required maxlength="160" autocomplete="email"></label></div>
+        <div class="row"><label class="f">WhatsApp<input id="w-wa" required maxlength="30" inputmode="tel" placeholder="341 555-0101"></label>
+          <label class="f">Provincia<select id="w-prov">${provOpts}</select></label>
+          <label class="f">Localidad<input id="w-loc" maxlength="80" placeholder="Rosario"></label></div>
+        ${pro?`<div class="row"><label class="f">Título o formación<select id="w-tit"><option>Arquitecto/a</option><option>Ingeniero/a civil</option><option>Ingeniero/a electricista</option><option>Ingeniero/a mecánico/a</option><option>Maestro Mayor de Obras</option><option>Técnico/a en construcciones</option><option>Diseñador/a de interiores</option><option>Modelador/a 3D / renderista</option><option>Estudiante avanzado/a</option></select></label>
+          <label class="f">Año de egreso <small>o “cursando”</small><input id="w-egr" maxlength="20" placeholder="2025"></label></div>
+          <label class="f">Especialidades y software<textarea id="w-esp" maxlength="600" style="min-height:70px" placeholder="Anteproyectos, Revit, renders, planos eléctricos…"></textarea></label>
+          <label class="f">Portfolio <small>Opcional</small><input id="w-port" maxlength="300" placeholder="https://"></label>`
+        :`<label class="f">Rubro<select id="w-rubro">${RUBROS.map(r=>`<option>${esc(r)}</option>`).join("")}</select></label>
+          <label class="f">¿Qué necesitás? <small>Medidas del terreno, qué querés hacer, plazo</small><textarea id="w-nec" required maxlength="2000" style="min-height:100px">${esc(extra||"")}</textarea></label>`}
+        <input id="w-hp" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px">
+        <div class="note">Tus datos de contacto no se publican. Los usamos solo para avisarte cuando abra la Red.</div>
+        ${st.err?`<div class="note" style="background:#fdf0e3;color:var(--warn)">${esc(st.err)}</div>`:""}
+        <button class="btn y" type="submit" ${st.enviando?"disabled":""}>${st.enviando?"Enviando…":"Anotarme"}</button>
+      </form>`;
+    $("#ax").onclick=()=>$("#auth").close();
+    $("#authbody").querySelectorAll("[data-t]").forEach(b=>b.onclick=()=>{st.tipo=b.dataset.t;st.err="";draw();});
+    $("#wf").onsubmit=async e=>{
+      e.preventDefault();
+      const v=id=>{const el=$(id);return el?el.value.trim():"";};
+      if(v("#w-hp")){st.ok=true;st.nombre="";draw();return;}
+      const d={tipo:st.tipo,nombre:v("#w-nombre"),email:v("#w-email"),whatsapp:v("#w-wa"),provincia:v("#w-prov"),localidad:v("#w-loc")||null,origen:"red.proyectamas.com.ar"};
+      if(st.tipo==="profesional")Object.assign(d,{titulo:v("#w-tit"),egreso:v("#w-egr")||null,especialidades:v("#w-esp")||null,portfolio:v("#w-port")||null});
+      else Object.assign(d,{tipo_publicante:document.querySelector("input[name=w-tp]:checked").value,rubro:v("#w-rubro"),necesidad:v("#w-nec")});
+      if(d.nombre.length<2){st.err="Escribí tu nombre.";draw();return;}
+      if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(d.email)){st.err="Revisá el email: parece incompleto.";draw();return;}
+      if(d.whatsapp.replace(/\D/g,"").length<6){st.err="Escribí un WhatsApp con característica, por ejemplo 341 555-0101.";draw();return;}
+      if(st.tipo==="publica"&&d.necesidad.length<10){st.err="Contanos un poco más qué necesitás.";draw();return;}
+      st.enviando=true;st.err="";draw();
+      try{
+        const r=await fetch(SB_URL+"/rest/v1/lista_espera",{method:"POST",headers:{apikey:SB_KEY,"Content-Type":"application/json",Prefer:"return=minimal"},body:JSON.stringify(d)});
+        if(!r.ok)throw new Error(r.status);
+        st.ok=true;st.nombre=d.nombre;waitDone[st.tipo]=true;
+      }catch(_){st.err=`No pudimos guardar tus datos. Probá de nuevo en un momento o escribinos por WhatsApp al ${WA_SHOW}.`;}
+      st.enviando=false;draw();
+    };
+  };
+  draw();
+  if(!$("#auth").open)$("#auth").showModal();
+}
+
+if(LISTA_ESPERA){
+  $("#launchcta").onclick=()=>openWaitlist("profesional");
+  const _goView=goView;
+  goView=function(v){
+    if(!esAdmin()&&(v==="publicar"||v==="registro")){openWaitlist(v==="publicar"?"publica":"profesional");return;}
+    _goView(v);
+  };
+  $("#signup").textContent="Sumarme como profesional";
+  $("#signup").onclick=()=>openWaitlist("profesional");
+  $("#login").hidden=true;$("#login").classList.remove("guest-only");
+  const _setUser=setUser;
+  setUser=function(u){_setUser(u);if(!u){$("#login").hidden=true;}};
+  const _openP=openP;
+  openP=function(id){
+    _openP(id);
+    if(esAdmin())return;
+    const pf=$("#pform"),qf=$("#qform");
+    const cta=`<div class="pmbox"><b>La Red abre en pocos días</b><span>Anotate como profesional y te avisamos para que puedas preguntar y enviar propuestas a proyectos como este.</span><div><button type="button" class="btn y sm" data-wl="profesional">Anotarme como profesional</button></div></div>`;
+    if(pf)pf.outerHTML=cta;
+    if(qf)qf.outerHTML=`<div style="margin-top:10px"><button type="button" class="btn o sm" data-wl="profesional">Anotate para poder preguntar</button></div>`;
+    const ro=$("#reobtn");if(ro)ro.closest(".reopen").remove();
+    $("#dlbody").querySelectorAll("[data-wl]").forEach(b=>b.onclick=()=>{$("#dlg").close();openWaitlist(b.dataset.wl);});
+  };
+  if(location.hash==="#admin")openAuth("in","pro");
+  addEventListener("hashchange",()=>{if(location.hash==="#admin")openAuth("in","pro");});
+}
+
 
 /* Fondo: puntos que forman obras icónicas de la arquitectura y van cambiando */
 (function(){
