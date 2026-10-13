@@ -103,3 +103,5 @@ footer a{color:var(--muted)}
 .tuto-acc{display:flex;gap:8px;justify-content:flex-end}
 .tuto-saltar{border:0;background:none;color:var(--muted);font:500 13px var(--f-body);text-decoration:underline;cursor:pointer;justify-self:start;padding:0}
 @media (prefers-reduced-motion:reduce){.tuto-luz,.tuto-bar i{transition:none}}
+.danger{border-color:#f3c9a3}
+.danger h2{color:var(--warn)}

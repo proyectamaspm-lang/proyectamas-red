@@ -762,7 +762,10 @@ async function miPerfil() {
       <p class="fine" style="margin:0">Subí de 3 a 6 imágenes de tus mejores trabajos (JPG, PNG o WEBP, hasta 5 MB). Sirven los de facultad o proyectos propios.</p>
       <div class="gallery">${port.map(f => `<figure><img src="${esc(foto(f.imagen_path))}" alt="${esc(f.titulo)}"><figcaption><b>${esc(f.titulo)}</b> <button class="linkbtn" data-delp="${f.id}" data-path="${esc(f.imagen_path)}">Quitar</button></figcaption></figure>`).join("")}</div>
       <form id="upf" style="display:grid;gap:10px"><div class="row"><label class="f">Título del trabajo<input name="t" required maxlength="120" placeholder="Vivienda en lote angosto"></label><label class="f">Imagen<input name="f" type="file" accept="image/jpeg,image/png,image/webp" required></label></div>
-      <label class="f">Descripción <small>Opcional</small><input name="d" maxlength="1000"></label><div><button class="btn o" type="submit">Subir</button></div></form></div>` : ""}`;
+      <label class="f">Descripción <small>Opcional</small><input name="d" maxlength="1000"></label><div><button class="btn o" type="submit">Subir</button></div></form></div>` : ""}
+    ${m.rol !== "admin" ? `<div class="formbox danger" style="max-width:820px;margin-top:16px"><h2 style="font:700 20px var(--f-body);margin:0">Eliminar mi cuenta</h2>
+      <p class="fine" style="margin:0">Se borran tu perfil, tus datos de contacto${pro ? ", tus propuestas, tus trabajos del portfolio, tus servicios" : ", tus proyectos con sus preguntas y propuestas"} y tus calificaciones. No se puede deshacer. Si tenés un trabajo en curso, primero terminalo o cerralo.</p>
+      <div><button type="button" class="btn o sm" id="delacc">Eliminar mi cuenta</button></div></div>` : ""}`;
   $("#pf").onsubmit = async e => {
     e.preventDefault(); const f = e.target;
     const row = { nombre: f.nombre.value.trim(), provincia: f.prov.value, localidad: f.loc.value.trim() };
@@ -778,6 +781,23 @@ async function miPerfil() {
     const path = `${S.user.id}/${Date.now()}-${file.name.replace(/[^\w.-]+/g, "_").slice(-60)}`;
     try { await q(sb.storage.from("portfolio").upload(path, file, { contentType: file.type })); await q(sb.from("portfolio").insert({ pro: S.user.id, titulo: f.t.value.trim(), descripcion: f.d.value.trim() || null, imagen_path: path, orden: port.length })); proCache = null; toast("Trabajo agregado"); miPerfil(); }
     catch (er) { toast(errMsg(er)); busy(b, false); }
+  };
+  if ($("#delacc")) $("#delacc").onclick = () => {
+    dialogo(`<div class="dlhead"><div><div class="eyebrow">No se puede deshacer</div><h2 id="auth-title" style="margin-top:4px">¿Eliminar tu cuenta?</h2></div>${cerrarX}</div>
+      <p style="margin:0">Se borra todo lo que tenés en la Red. Para confirmar, escribí <b>ELIMINAR</b>.</p>
+      <form id="delf" class="authf"><input id="delin" autocomplete="off" aria-label="Escribí ELIMINAR"><div class="formerr" id="delerr" hidden></div>
+      <div class="inline"><button class="btn sm" type="submit" style="background:var(--warn);border-color:var(--warn)">Eliminar definitivamente</button><button type="button" class="btn o sm" data-close>Cancelar</button></div></form>`, "auth");
+    $("#delf").onsubmit = async e => {
+      e.preventDefault(); const err = $("#delerr"); err.hidden = true;
+      if ($("#delin").value.trim().toUpperCase() !== "ELIMINAR") { err.textContent = "Escribí ELIMINAR para confirmar."; err.hidden = false; return; }
+      const b = $("#delf button[type=submit]"); busy(b, true, "Eliminando…");
+      try {
+        const { data: arch } = await sb.storage.from("portfolio").list(S.user.id, { limit: 100 });
+        if (arch?.length) await sb.storage.from("portfolio").remove(arch.map(f => `${S.user.id}/${f.name}`));
+        await q(sb.rpc("eliminar_mi_cuenta"));
+        await sb.auth.signOut(); $("#auth").close(); location.hash = ""; toast("Tu cuenta fue eliminada");
+      } catch (er) { err.textContent = errMsg(er); err.hidden = false; busy(b, false); }
+    };
   };
   $$("[data-delp]").forEach(b => b.onclick = async () => { try { await q(sb.from("portfolio").delete().eq("id", +b.dataset.delp)); await sb.storage.from("portfolio").remove([b.dataset.path]); proCache = null; miPerfil(); } catch (er) { toast(errMsg(er)); } });
 }
