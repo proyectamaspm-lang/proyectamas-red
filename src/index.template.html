@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Red Proyecta Más</title>
+<meta name="description" content="Publicá tu proyecto de arquitectura, ingeniería u obra y recibí propuestas de profesionales independientes de toda Argentina. Gratis y sin comisiones.">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/icon/favicon-32.png">
+<link rel="icon" type="image/png" sizes="192x192" href="assets/icon/favicon-192.png">
+<link rel="apple-touch-icon" href="assets/icon/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bangers&family=Barlow:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="css/red.css">
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+
+<header>
+  <div class="bar">
+    <a class="logo" href="#" aria-label="Proyecta Más Red, inicio">PROYECTA<span class="plus">+</span><em>RED</em></a>
+    <nav class="links" aria-label="Secciones">
+      <a href="#proyectos">Proyectos</a>
+      <a href="#profesionales">Profesionales</a>
+      <a href="#servicios">Servicios</a>
+      <a href="#estimador">¿Cuánto cuesta?</a>
+      <a href="#herramientas">Herramientas</a>
+      <a href="#publicar" class="btn o sm">Publicar proyecto</a>
+      <button class="btn o sm" type="button" id="vertuto">Ver tutorial</button>
+      <button class="btn o sm" data-auth="in" data-when="guest">Ingresar</button>
+      <button class="btn sm" data-auth="up" data-when="guest">Crear cuenta</button>
+      <div class="usermenu" data-when="user" hidden>
+        <button class="memberchip" id="umbtn" aria-haspopup="true" aria-expanded="false"><span id="uname">Mi cuenta</span> <span id="urol" class="pill"></span></button>
+        <div class="umlist" id="umlist" hidden>
+          <a href="#mis-proyectos" data-when="cli admin">Mis proyectos</a>
+          <a href="#mis-propuestas" data-when="pro admin">Mis propuestas</a>
+          <a href="#mis-servicios" data-when="pro admin">Mis servicios</a>
+          <a href="#kit" data-when="pro admin">Kit primer cliente</a>
+          <a href="#perfil">Mi perfil</a>
+          <a href="#panel" data-when="admin">Panel de admin</a>
+          <button type="button" id="logout">Salir</button>
+        </div>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<main>
+<!-- ============ INICIO ============ -->
+<div class="view" id="v-inicio">
+{{HERO}}
+
+  <section class="blk" id="proyectos">
+    <div class="wrap">
+      <div class="boardhead">
+        <div>
+          <div class="eyebrow">Tablero</div>
+          <h2 class="big">Proyectos <mark>abiertos</mark></h2>
+          <p class="lead">Arquitectura, ingeniería, instalaciones, 3D y cómputo de todo el país. Tocá un proyecto para ver la ficha completa y sus preguntas.</p>
+        </div>
+        <a class="btn" href="#publicar">Publicar proyecto</a>
+      </div>
+      <div class="filters">
+        <input type="search" id="q" placeholder="Buscar: anteproyecto, render, eléctrico, Revit…" aria-label="Buscar proyectos">
+        <select id="f-rubro" aria-label="Rubro"><option value="">Todos los rubros</option></select>
+        <select id="f-prov" aria-label="Provincia"><option value="">Todo el país</option></select>
+        <select id="f-cupo" aria-label="Cupos"><option value="">Todos los cupos</option><option value="libre">Con cupo libre</option><option value="completo">Cupo completo</option></select>
+      </div>
+      <div class="grid" id="grid"><div class="empty">Cargando proyectos…</div></div>
+    </div>
+  </section>
+
+  <section class="blk" id="estimador" style="padding-top:8px">
+    <div class="wrap">
+      <div class="estbox">
+        <div>
+          <div class="eyebrow">Estimador de honorarios</div>
+          <h2 class="big">¿Cuánto debería <mark>costar?</mark></h2>
+          <p class="lead">Una referencia rápida para publicar con un presupuesto realista. Cada profesional cotiza según tu caso.</p>
+        </div>
+        <div id="est-main" class="est"></div>
+      </div>
+    </div>
+  </section>
+
+{{RESPALDO}}
+{{PRIMER}}
+{{CAMINO}}
+{{BENEFICIOS}}
+{{QUIEN}}
+</div>
+
+<!-- ============ PROFESIONALES ============ -->
+<div class="view" id="v-profesionales" hidden>
+  <div class="wrap pagepad">
+    <div class="eyebrow">Directorio</div>
+    <h2 class="big">Profesionales de <mark>la Red</mark></h2>
+    <p class="lead">Arquitectos, ingenieros, MMO, técnicos y renderistas independientes. El sello <b>Verificado</b> indica que confirmamos su identidad; <b>Matrícula verificada</b>, que también confirmamos su matrícula.</p>
+    <div class="filters" style="margin-top:16px">
+      <input type="search" id="pq" placeholder="Buscar por nombre, especialidad o software" aria-label="Buscar profesionales">
+      <select id="pf-prov" aria-label="Provincia"><option value="">Todo el país</option></select>
+      <label class="tog"><input type="checkbox" id="p-ver"> Solo verificados</label>
+    </div>
+    <div class="grid" id="progrid"><div class="empty">Cargando…</div></div>
+  </div>
+</div>
+
+<!-- ============ SERVICIOS ============ -->
+<div class="view" id="v-servicios" hidden>
+  <div class="wrap pagepad">
+    <div class="eyebrow">Precio cerrado</div>
+    <h2 class="big">Servicios <mark>listos para pedir</mark></h2>
+    <p class="lead">Trabajos con alcance, plazo y precio definidos. Elegís el paquete, contás tu caso y el profesional acepta. Sin publicar ni esperar propuestas.</p>
+    <div class="filters" style="margin-top:16px">
+      <input type="search" id="sq" placeholder="Buscar: plano eléctrico, render, cómputo…" aria-label="Buscar servicios">
+      <select id="s-rubro" aria-label="Rubro"><option value="">Todos los rubros</option></select>
+    </div>
+    <div class="grid" id="svgrid"><div class="empty">Cargando…</div></div>
+  </div>
+</div>
+
+<!-- ============ PUBLICAR ============ -->
+<div class="view" id="v-publicar" hidden>
+  <div class="wrap formwrap">
+    <form class="formbox" id="pubform" autocomplete="off">
+      <div><div class="eyebrow">Gratis · Sin comisiones</div><h1>Publicá tu proyecto</h1></div>
+      <fieldset>
+        <legend><i>1</i>El proyecto</legend>
+        <label class="f">Título <small>Qué necesitás, en una línea</small><input id="p-titulo" required minlength="5" maxlength="120" placeholder="Anteproyecto de vivienda en terreno con desnivel"></label>
+        <div class="row">
+          <label class="f">Rubro<select id="p-rubro" required></select></label>
+          <label class="f">Tipo de trabajo<select id="p-trabajo" required></select></label>
+        </div>
+        <label class="f">Descripción <small>Programa de necesidades, estilo, referencias y lo que ya tenés (planos, mensura, fotos)</small><textarea id="p-desc" required maxlength="4000" placeholder="Casa de 2 plantas con 3 dormitorios, cochera para 2 autos y quincho. Tengo la mensura en PDF."></textarea></label>
+        <label class="f">Entregables esperados <small>Opcional</small><input id="p-entreg" maxlength="400" placeholder="Plantas, cortes, fachadas, 4 renders, PDF + DWG"></label>
+      </fieldset>
+      <fieldset>
+        <legend><i>2</i>Terreno y medidas</legend>
+        <div class="row">
+          <label class="f">Frente (m)<input id="p-frente" type="number" step="0.01" min="0"></label>
+          <label class="f">Fondo (m)<input id="p-fondo" type="number" step="0.01" min="0"></label>
+          <label class="f">Sup. a proyectar (m²)<input id="p-sup" type="number" step="1" min="0"></label>
+        </div>
+        <label class="f">Desnivel u otra particularidad<input id="p-desnivel" maxlength="200" placeholder="El fondo está 1,50 m más alto · lote en esquina"></label>
+      </fieldset>
+      <fieldset>
+        <legend><i>3</i>Ubicación, plazo y presupuesto</legend>
+        <div class="row">
+          <label class="f">Provincia<select id="p-prov" required></select></label>
+          <label class="f">Localidad<input id="p-loc" required maxlength="80" placeholder="Rosario"></label>
+        </div>
+        <div class="row">
+          <label class="f">Plazo<input id="p-plazo" maxlength="60" placeholder="30 días"></label>
+          <label class="f">Presupuesto <small>Opcional</small><input id="p-pres" maxlength="60" placeholder="$450.000 o “a convenir”"></label>
+        </div>
+        <div id="est-pub" class="est est-inline"></div>
+        <div class="choice">
+          <label><input type="radio" name="mod" value="Remoto" checked> Se puede hacer remoto</label>
+          <label><input type="radio" name="mod" value="Presencial"> Necesita visitar la obra</label>
+        </div>
+      </fieldset>
+      <fieldset>
+        <legend><i>4</i>Etiquetas</legend>
+        <div class="chipin" id="chipin"><input id="p-tag" placeholder="Escribí y apretá Enter" aria-label="Agregar etiqueta"></div>
+        <div class="suggest" id="suggest">Sugeridas:</div>
+      </fieldset>
+      <fieldset>
+        <legend><i>5</i>Propuestas</legend>
+        <label class="f" style="max-width:300px">¿Cuántas propuestas querés recibir?<select id="p-max"><option>3</option><option selected>5</option><option>10</option><option>15</option><option>20</option></select></label>
+        <div class="note">Cuando llegues a ese número, el proyecto se cierra. Si no te convence ninguna, podés reabrir cupos.</div>
+      </fieldset>
+      <div class="formerr" id="puberr" hidden></div>
+      <div class="inline"><button class="btn" type="submit" id="pubsend">Publicar proyecto</button></div>
+    </form>
+    <aside class="aside">
+      <div class="asidecard y"><b>Cuantos más datos, mejores propuestas</b><span>Las medidas del terreno, lo que ya tenés y qué entregables esperás evitan propuestas genéricas.</span></div>
+      <div class="asidecard"><b>Vas a recibir preguntas</b><span>Los profesionales pueden preguntar antes de proponer. Las respuestas quedan públicas.</span></div>
+      <div class="asidecard"><b>Tus datos no se publican</b><span>Tu WhatsApp y tu email se comparten solo con el profesional cuya propuesta aceptes.</span></div>
+    </aside>
+  </div>
+</div>
+
+<!-- ============ REGISTRO ============ -->
+<div class="view" id="v-registro" hidden>
+  <div class="wrap formwrap">
+    <form class="formbox" id="regform" autocomplete="on">
+      <div><div class="eyebrow">Red Proyecta Más</div><h1>Crear cuenta</h1></div>
+      <div class="roles">
+        <button type="button" class="role on" data-rol="cli"><b>Quiero publicar proyectos</b><span>Particular, estudio o empresa</span></button>
+        <button type="button" class="role" data-rol="pro"><b>Soy profesional</b><span>Quiero recibir proyectos</span></button>
+      </div>
+      <fieldset>
+        <legend><i>1</i>Tus datos</legend>
+        <div class="choice" data-only="cli">
+          <label><input type="radio" name="r-tipo" value="Particular" checked> Particular</label>
+          <label><input type="radio" name="r-tipo" value="Estudio"> Estudio</label>
+          <label><input type="radio" name="r-tipo" value="Empresa"> Empresa / constructora / inmobiliaria</label>
+        </div>
+        <div class="row">
+          <label class="f"><span id="r-nombre-l">Nombre o razón social</span><input id="r-nombre" required minlength="2" maxlength="120" autocomplete="name"></label>
+          <label class="f" data-only="cli">Persona de contacto <small>Si es estudio o empresa</small><input id="r-contacto" maxlength="120"></label>
+        </div>
+        <div class="row">
+          <label class="f">Email<input id="r-email" type="email" required maxlength="160" autocomplete="email"></label>
+          <label class="f">WhatsApp <small>Se comparte solo al aceptar una propuesta</small><input id="r-wa" required maxlength="30" inputmode="tel" placeholder="341 555-0101"></label>
+        </div>
+        <div class="row">
+          <label class="f">Provincia<select id="r-prov" required></select></label>
+          <label class="f">Localidad<input id="r-loc" required maxlength="80" placeholder="Rosario"></label>
+          <label class="f" data-only="cli">CUIT <small>Opcional</small><input id="r-cuit" maxlength="20"></label>
+        </div>
+      </fieldset>
+      <fieldset data-only="pro" hidden>
+        <legend><i>2</i>Formación y trabajo</legend>
+        <div class="note">Te registrás como <b>persona</b>, de forma independiente. Los estudios y empresas pueden publicar proyectos, pero no enviar propuestas.</div>
+        <div class="row">
+          <label class="f">Título<select id="r-titulo"></select></label>
+          <label class="f">Año de egreso <small>o “cursando”</small><input id="r-egreso" maxlength="20" placeholder="2025"></label>
+          <label class="f">Matrícula <small>Opcional, ej. CPT 1234</small><input id="r-mat" maxlength="40"></label>
+        </div>
+        <label class="f">Especialidades y software<textarea id="r-esp" maxlength="600" placeholder="Anteproyectos residenciales, Revit LOD 300, renders en D5, planos eléctricos AEA."></textarea></label>
+        <label class="f">Portfolio externo <small>Opcional. Después podés subir imágenes a tu perfil.</small><input id="r-port" maxlength="300" placeholder="https://"></label>
+        <label class="check"><input type="checkbox" id="r-decl"> <span>Me registro como <b>persona</b>, de forma independiente, y no en nombre de un estudio o empresa.</span></label>
+      </fieldset>
+      <fieldset>
+        <legend><i>3</i>Contraseña</legend>
+        <label class="f" style="max-width:320px">Contraseña <small>Mínimo 8 caracteres</small><input id="r-pass" type="password" required minlength="8" autocomplete="new-password"></label>
+        <label class="check"><input type="checkbox" id="r-terms" required> <span>Acepto los <a href="terminos.html" target="_blank" rel="noopener">términos y la política de privacidad</a> de la Red.</span></label>
+      </fieldset>
+      <div class="formerr" id="regerr" hidden></div>
+      <div class="inline"><button class="btn" type="submit" id="regsend">Crear cuenta</button><button type="button" class="linkbtn" data-auth="in">Ya tengo cuenta</button></div>
+    </form>
+    <aside class="aside">
+      <div class="asidecard y" data-only="pro" hidden><b>Al registrarte recibís</b><ul><li>Acceso a todos los proyectos</li><li>Kit Primer Cliente: 10 manuales y plantillas</li><li>Revisión de tus primeras propuestas</li><li>Llamadas de 30 minutos para destrabar dudas</li></ul></div>
+      <div class="asidecard y" data-only="cli"><b>Publicar es gratis</b><span>Contás qué necesitás, recibís preguntas y propuestas, y elegís con quién trabajar. Sin comisiones.</span></div>
+      <div class="asidecard"><b>Te llega un mail para confirmar</b><span>Después de crear la cuenta, abrí el link que te mandamos para activarla.</span></div>
+    </aside>
+  </div>
+</div>
+
+<!-- ============ MIS PROYECTOS ============ -->
+<div class="view" id="v-mis-proyectos" hidden>
+  <div class="wrap pagepad">
+    <div class="eyebrow">Tu cuenta</div>
+    <h2 class="big">Mis <mark>proyectos</mark></h2>
+    <p class="lead">Propuestas recibidas, contactos, etapas del acuerdo y calificaciones.</p>
+    <div class="inline" style="margin:14px 0"><a class="btn" href="#publicar">Publicar un proyecto</a><a class="btn o" href="#servicios">Pedir un servicio</a></div>
+    <div id="mpbox" class="mislist"></div>
+  </div>
+</div>
+
+<!-- ============ MIS PROPUESTAS ============ -->
+<div class="view" id="v-mis-propuestas" hidden>
+  <div class="wrap pagepad">
+    <div class="eyebrow">Tu actividad</div>
+    <h2 class="big">Mis <mark>propuestas</mark></h2>
+    <p class="lead">El estado de cada propuesta, las correcciones de Proyecta Más, tus trabajos en curso y las invitaciones para firmar.</p>
+    <div id="mprbox" class="mislist"></div>
+  </div>
+</div>
+
+<!-- ============ MIS SERVICIOS ============ -->
+<div class="view" id="v-mis-servicios" hidden>
+  <div class="wrap pagepad">
+    <div class="eyebrow">Precio cerrado</div>
+    <h2 class="big">Mis <mark>servicios</mark></h2>
+    <p class="lead">Publicá trabajos con alcance y precio definidos. Los clientes los piden sin publicar un proyecto.</p>
+    <div class="inline" style="margin:14px 0"><button class="btn" id="svnew">Nuevo servicio</button></div>
+    <div id="msvbox" class="mislist"></div>
+  </div>
+</div>
+
+<!-- ============ PERFIL ============ -->
+<div class="view" id="v-perfil" hidden>
+  <div class="wrap pagepad"><div id="perfilbox"></div></div>
+</div>
+
+<!-- ============ KIT (atajo) ============ -->
+<div class="view" id="v-kit" hidden></div>
+
+<!-- ============ PANEL ADMIN ============ -->
+<div class="view" id="v-panel" hidden>
+  <div class="wrap pagepad">
+    <div class="eyebrow">Solo Proyecta Más</div>
+    <h2 class="big">Panel de <mark>administración</mark></h2>
+    <div class="tabs" id="ptabs" role="tablist"></div>
+    <div id="pbox"></div>
+  </div>
+</div>
+</main>
+
+<footer><div class="wrap">
+  <span><b class="flogo">PROYECTA<span>+</span></b> · Red de profesionales independientes</span>
+  <span>La Red no cobra comisiones ni interviene en los pagos entre las partes. · <a href="terminos.html">Términos y privacidad</a> · <a href="https://proyectamas.com.ar">proyectamas.com.ar</a></span>
+</div></footer>
+
+<dialog id="dlg" aria-labelledby="dl-title"><div class="dl" id="dlbody"></div></dialog>
+<dialog id="auth" class="fbdlg" aria-labelledby="auth-title"><div class="dl" id="authbody"></div></dialog>
+<div class="toast" id="toast" role="status" hidden></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="js/manuales.js"></script>
+<script src="js/tutorial.js"></script>
+<script src="js/app.js"></script>
+<script src="js/fondo.js"></script>
+</body>
+</html>
