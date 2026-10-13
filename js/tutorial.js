@@ -7,7 +7,6 @@
     cli: [
       { hash: "", sel: null, t: "Bienvenido a la Red", x: "Acá publicás lo que necesitás (un anteproyecto, planos de instalación, renders, un cómputo) y te llegan propuestas de profesionales de todo el país. Es gratis y sin comisiones. Te mostramos dónde está cada cosa." },
       { hash: "proyectos", sel: "#proyectos .boardhead", t: "El tablero", x: "Todos los proyectos publicados. Podés buscar por palabra, rubro, provincia o si todavía tienen lugar para propuestas." },
-      { hash: "estimador", sel: "#estimador", t: "¿Cuánto cuesta?", x: "Antes de publicar, mirá un rango orientativo de honorarios según el tipo de trabajo, los m² y la complejidad. Te sirve para poner un presupuesto realista." },
       { hash: "profesionales", sel: "#v-profesionales .boardhead, #v-profesionales h1, #v-profesionales h2", t: "Profesionales", x: "El directorio con perfiles, trabajos, calificaciones y cuánto tardan en responder. El sello Verificado indica que revisamos su identidad, y el de Matrícula, que la matrícula está confirmada." },
       { hash: "servicios", sel: "#v-servicios h1, #v-servicios h2", t: "Servicios con precio cerrado", x: "Si tu necesidad es simple (un plano eléctrico, 3 renders), quizás ya hay un servicio con precio y plazo fijos. Lo pedís y listo, sin esperar propuestas." },
       { hash: "publicar", sel: "#p-titulo", t: "Publicar: el título", x: "Qué necesitás en una línea. Sé concreto: «Anteproyecto de vivienda en lote de 10 × 30 con desnivel» atrae mejores propuestas que «Necesito un arquitecto»." },
@@ -18,7 +17,6 @@
       { hash: "publicar", sel: "#p-loc", t: "Ubicación, plazo y presupuesto", x: "La localidad importa por el código de edificación. El plazo y el presupuesto son opcionales, pero ayudan a que te propongan algo que encaje." },
       { hash: "publicar", sel: "#chipin", t: "Etiquetas", x: "Palabras clave para que te encuentren: #vivienda, #reforma, #Revit, #steel frame. Escribí y apretá Enter, o tocá las sugeridas." },
       { hash: "publicar", sel: "#p-max", t: "Cuántas propuestas querés", x: "Cuando llegás a ese número el proyecto deja de recibir propuestas, así no te llenás de mensajes. Si ninguna te convence, lo reabrís con más cupos." },
-      { hash: "publicar", sel: "#est-pub", t: "Referencia de precio", x: "Si no sabés qué presupuesto poner, este estimador te da un rango orientativo para tu trabajo." },
       { hash: "publicar", sel: "#pubsend", t: "Publicar", x: "Listo. Los profesionales pueden hacerte preguntas públicas (las respondés desde la ficha) y mandarte propuestas. Te avisamos por mail cada vez que llega algo." },
       { hash: "", sel: "#umbtn", t: "Mis proyectos", x: "Desde tu menú entrás a Mis proyectos: ahí comparás propuestas, ves el perfil y las calificaciones de cada profesional y aceptás la que más te guste. Al aceptar se comparten los contactos." },
       { hash: "", sel: null, t: "Después de aceptar", x: "En el mismo lugar aparecen las etapas del acuerdo (anticipo, entrega, saldo) para que los dos vayan marcando el avance. Solo las ven ustedes dos. Al terminar, se califican mutuamente." }
@@ -32,6 +30,7 @@
       { hash: "", sel: null, t: "Revisión antes de enviar", x: "Si tildás «Que Proyecta Más revise mi propuesta», te devolvemos sugerencias en 24 h hábiles antes de que la vea el cliente. Muy recomendable para las primeras." },
       { hash: "kit", sel: "#primer-cliente", t: "Kit primer cliente", x: "10 manuales cortos (cómo cotizar, cómo escribir la propuesta, contratos, matriculación), una calculadora de valor hora y la reserva de llamadas de 30 minutos por Meet." },
       { hash: "kit", sel: "#calc", t: "Calculadora de valor hora", x: "Poné tus gastos fijos, lo que querés ganar y las horas que facturás: te da tu valor hora y el precio sugerido para el trabajo, con anticipo y saldo." },
+      { hash: "estimador", sel: "#estimador", t: "Estimador de honorarios", x: "Rango de referencia según el tipo de trabajo, los m² y la complejidad. También aparece dentro del formulario de propuesta. Solo lo ven los profesionales." },
       { hash: "kit", sel: "#call", t: "Llamada de 30 minutos", x: "¿Dudas con una cotización o un cliente? Elegí día y horario y confirmalo por WhatsApp. Te mandamos el link de Meet." },
       { hash: "perfil", sel: "#perfilbox form, #perfilbox", t: "Tu perfil", x: "Completá título, matrícula, especialidades y software. Sumá de 3 a 6 imágenes de tus trabajos: sirven los de la facultad. Un perfil completo es lo que más decide al cliente." },
       { hash: "perfil", sel: "#perfilbox .note, #perfilbox", t: "Sello Verificado", x: "Pedilo por WhatsApp con foto de tu DNI (y matrícula si tenés). Los perfiles verificados aparecen primero." },
@@ -51,7 +50,7 @@
   };
 
   RECORRIDOS.visita = [
-    ...RECORRIDOS.cli.slice(0, 5),
+    ...RECORRIDOS.cli.slice(0, 4),
     { hash: "", sel: "[data-auth='up']", t: "Creá tu cuenta gratis", x: "Para publicar un proyecto o mandar propuestas necesitás una cuenta. Elegís si sos quien publica o profesional, y después te guiamos campo por campo." }
   ];
 

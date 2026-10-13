@@ -22,7 +22,7 @@
       <a href="#proyectos">Proyectos</a>
       <a href="#profesionales">Profesionales</a>
       <a href="#servicios">Servicios</a>
-      <a href="#estimador">¿Cuánto cuesta?</a>
+      <a href="#estimador" class="pro-only" hidden>Estimador</a>
       <a href="#herramientas">Herramientas</a>
       <a href="#publicar" class="btn o sm">Publicar proyecto</a>
       <button class="btn o sm" type="button" id="vertuto">Ver tutorial</button>
@@ -69,13 +69,13 @@
     </div>
   </section>
 
-  <section class="blk" id="estimador" style="padding-top:8px">
+  <section class="blk pro-only" id="estimador" style="padding-top:8px" hidden>
     <div class="wrap">
       <div class="estbox">
         <div>
           <div class="eyebrow">Estimador de honorarios</div>
-          <h2 class="big">¿Cuánto debería <mark>costar?</mark></h2>
-          <p class="lead">Una referencia rápida para publicar con un presupuesto realista. Cada profesional cotiza según tu caso.</p>
+          <h2 class="big">¿Cuánto <mark>cobrar?</mark></h2>
+          <p class="lead">Una referencia de honorarios según el tipo de trabajo, los m² y la complejidad, para que cotices con números. Solo la ven los profesionales de la Red.</p>
         </div>
         <div id="est-main" class="est"></div>
       </div>
@@ -152,7 +152,6 @@
           <label class="f">Plazo<input id="p-plazo" maxlength="60" placeholder="30 días"></label>
           <label class="f">Presupuesto <small>Opcional</small><input id="p-pres" maxlength="60" placeholder="$450.000 o “a convenir”"></label>
         </div>
-        <div id="est-pub" class="est est-inline"></div>
         <div class="choice">
           <label><input type="radio" name="mod" value="Remoto" checked> Se puede hacer remoto</label>
           <label><input type="radio" name="mod" value="Presencial"> Necesita visitar la obra</label>

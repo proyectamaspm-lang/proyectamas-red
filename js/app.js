@@ -202,7 +202,7 @@ async function router() {
   if (h === "admin") { location.hash = "panel"; return; }
   if (SECCIONES[h]) {
     mostrar("inicio");
-    if ((h === "kit" || h === "respaldo" || h === "camino") && !esPro()) { location.hash = "registro"; pintarRegistro("pro"); return; }
+    if ((h === "kit" || h === "respaldo" || h === "camino" || h === "estimador") && !esPro()) { location.hash = "registro"; pintarRegistro("pro"); return; }
     requestAnimationFrame(() => document.getElementById(SECCIONES[h])?.scrollIntoView({ behavior: "smooth" }));
     return;
   }
@@ -376,8 +376,9 @@ async function datosEstimador() {
   S.cfg = Object.fromEntries(cfg.map(r => [r.clave, +r.valor])); S.honor = honor;
 }
 async function montarEstimador(box, o = {}) {
-  if (!box) return;
+  if (!box || !esPro()) return;
   try { await datosEstimador(); } catch { box.innerHTML = ""; return; }
+  if (!S.honor.length) { S.cfg = null; box.innerHTML = ""; return; }
   const h0 = S.honor.find(h => h.trabajo === o.trabajo) || S.honor[0];
   box.innerHTML = `${o.titulo ? `<b style="font-size:15px">${esc(o.titulo)}</b>` : ""}
     <div class="row">
@@ -412,7 +413,6 @@ $("#suggest").addEventListener("click", e => { const b = e.target.closest("[data
 async function prepPublicar() {
   if (S.me?.provincia) $("#p-prov").value = S.me.provincia;
   if (S.me?.localidad && !$("#p-loc").value) $("#p-loc").value = S.me.localidad;
-  if (!estPub) estPub = await montarEstimador($("#est-pub"), { titulo: "¿No sabés cuánto poner? Referencia de honorarios" });
 }
 ["#p-trabajo", "#p-sup"].forEach(s => $(s).addEventListener("change", () => estPub?.set($("#p-trabajo").value, +$("#p-sup").value)));
 $("#pubform").onsubmit = async e => {
@@ -838,7 +838,7 @@ async function pOpiniones(box) {
 }
 async function pEstimador(box) {
   S.cfg = null; await datosEstimador();
-  box.innerHTML = `<p class="lead">Estos valores alimentan el estimador público. Actualizá el valor hora cuando cambien los precios.</p>
+  box.innerHTML = `<p class="lead">Estos valores alimentan el estimador que ven los profesionales. Actualizá el valor hora cuando cambien los precios.</p>
     <div class="row" style="max-width:520px"><label class="f">Valor hora (ARS)<input type="number" id="cfg-vh" value="${S.cfg.valor_hora_ars}"></label><label class="f">Margen imprevistos (0,20 = 20%)<input type="number" step="0.01" id="cfg-mg" value="${S.cfg.margen_imprevistos}"></label></div>
     <div class="tbl2" style="margin-top:12px"><table><thead><tr><th>Trabajo</th><th>Unidad</th><th>Horas mín.</th><th>Habitual</th><th>Máx.</th><th>Mínimo (h)</th></tr></thead><tbody>${S.honor.map(h => `<tr data-h="${h.id}"><td>${esc(h.trabajo)}</td><td>${esc(h.unidad)}</td>${["horas_min", "horas_tip", "horas_max", "minimo_horas"].map(k => `<td><input type="number" step="0.01" data-k="${k}" value="${h[k]}"></td>`).join("")}</tr>`).join("")}</tbody></table></div>
     <div class="inline" style="margin-top:12px"><button class="btn" id="cfgsave">Guardar</button></div>`;
@@ -939,11 +939,11 @@ function tutoAuto() { if (!esAdmin()) window.tutorial?.auto(tutoClave()); }
 fill("#f-rubro", RUBROS, true); fill("#f-prov", PROVS, true); fill("#pf-prov", PROVS, true); fill("#s-rubro", RUBROS, true);
 fill("#p-rubro", RUBROS); fill("#p-trabajo", TRABAJOS); fill("#p-prov", PROVS); fill("#r-prov", PROVS); fill("#r-titulo", TITULOS);
 $("#p-prov").value = "Santa Fe"; $("#r-prov").value = "Santa Fe";
-function agendaSiPro() { if (esPro()) agenda(); }
+let estMain = false;
+function agendaSiPro() { if (!esPro()) return; agenda(); if (!estMain) { estMain = true; montarEstimador($("#est-main")); } }
 (async () => {
   await cargarYo();
   uidPrevio = S.user?.id || null; listo = true;
-  montarEstimador($("#est-main"));
   await cargarProyectos();
   router();
   tutoAuto();
