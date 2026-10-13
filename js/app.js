@@ -197,7 +197,7 @@ const SECCIONES = { proyectos: "proyectos", estimador: "estimador", herramientas
 function mostrar(v) { $$(".view").forEach(x => x.hidden = x.id !== "v-" + v); }
 async function router() {
   const h = decodeURIComponent(location.hash.slice(1));
-  if (h.startsWith("proyecto-")) { mostrar("inicio"); return abrirProyecto(+h.slice(9)); }
+  if (h.startsWith("proyecto-")) { mostrar("inicio"); const pid = h.slice(9); return pid.startsWith("ej") ? abrirEjemplo(pid) : abrirProyecto(+pid); }
   if (h.startsWith("pro-")) { mostrar("profesionales"); cargarProfesionales(); return abrirPerfil(h.slice(4)); }
   if (h === "admin") { location.hash = "panel"; return; }
   if (SECCIONES[h]) {
@@ -243,9 +243,10 @@ function cupo(p) { const n = Math.min(p.max_propuestas, 20), on = Math.round(p.p
 function specs(p) { const s = []; if (p.frente && p.fondo) s.push(`${num(p.frente)} × ${num(p.fondo)} m`); if (p.superficie) s.push(`${num(p.superficie)} m²`); if (p.particularidad) s.push(esc(p.particularidad)); return s.map(x => `<span>${x}</span>`).join(""); }
 function pintarTablero() {
   const qq = $("#q").value.trim().toLowerCase(), r = $("#f-rubro").value, pv = $("#f-prov").value, cu = $("#f-cupo").value;
-  const list = S.proyectos.filter(p => (!qq || (p.titulo + p.descripcion + p.etiquetas.join(" ") + p.localidad).toLowerCase().includes(qq)) && (!r || p.rubro === r) && (!pv || p.provincia === pv) && (!cu || (cu === "libre" ? p.estado === "abierto" : p.estado === "completo")));
+  const list = [...S.proyectos, ...(window.EJEMPLOS || [])].filter(p => (!qq || (p.titulo + p.descripcion + p.etiquetas.join(" ") + p.localidad).toLowerCase().includes(qq)) && (!r || p.rubro === r) && (!pv || p.provincia === pv) && (!cu || (cu === "libre" ? p.estado === "abierto" : p.estado === "completo")));
   $("#grid").innerHTML = list.length ? list.map(p => `
-   <article class="card" tabindex="0" data-id="${p.id}" role="button" aria-label="Ver ${esc(p.titulo)}">
+   <article class="card" tabindex="0" data-id="${p.id}" role="button" aria-label="Ver ${esc(p.titulo)}${p.ejemplo ? " (ejemplo)" : ""}">
+    ${p.ejemplo ? '<span class="stamp">EJEMPLO</span>' : ""}
     <div class="cbody">
      <div class="meta">${estadoPill(p)}</div>
      <h3>${esc(p.titulo)}</h3>
@@ -259,7 +260,7 @@ function pintarTablero() {
      <div><small>Ubicación</small><b>${esc(p.localidad)}</b></div>
      <div><small>Propuestas ${p.propuestas_enviadas}/${p.max_propuestas}</small><div class="cupo">${cupo(p)}</div></div>
     </div>
-   </article>`).join("") : `<div class="empty">${S.proyectos.length ? "No hay proyectos con esos filtros." : "Todavía no hay proyectos abiertos. ¿Necesitás algo? <a href=\"#publicar\">Publicá el primero</a>."}</div>`;
+   </article>`).join("") : `<div class="empty">No hay proyectos con esos filtros.</div>`;
 }
 $("#grid").addEventListener("click", e => { const c = e.target.closest(".card"); if (c) location.hash = "proyecto-" + c.dataset.id; });
 $("#grid").addEventListener("keydown", e => { if (e.key === "Enter" && e.target.classList.contains("card")) location.hash = "proyecto-" + e.target.dataset.id; });
@@ -319,6 +320,29 @@ async function abrirProyecto(id) {
     catch (er) { toast(errMsg(er)); }
   };
   if ($("#pform")) bindPropuesta(p);
+}
+/* ficha de un proyecto de ejemplo: solo lectura */
+function abrirEjemplo(id) {
+  const p = (window.EJEMPLOS || []).find(x => x.id === id);
+  if (!p) { location.hash = "proyectos"; return; }
+  const ficha = [["Frente", p.frente ? num(p.frente) + " m" : "—"], ["Fondo", p.fondo ? num(p.fondo) + " m" : "—"], ["Superficie", p.superficie ? num(p.superficie) + " m²" : "—"], ["Particularidad", p.particularidad || "—"], ["Plazo", p.plazo || "—"], ["Presupuesto", p.presupuesto || "No indicado"]];
+  const props = p.props.filter(x => !x.soloPro || esPro());
+  const pie = esPro()
+    ? `<div class="note">Es un proyecto de ejemplo: no recibe propuestas. Te sirve para ver cómo se arma una buena propuesta. Los proyectos reales están en el tablero sin el sello.</div>`
+    : `<div class="pmbox"><b>Así se ve un proyecto bien publicado</b><span>Con medidas, qué tenés hecho y qué esperás recibir, te llegan propuestas más precisas.</span><div class="inline"><a class="btn y sm" href="#publicar" data-close>Publicar mi proyecto</a></div></div>`;
+  dialogo(`
+   <div class="dlhead"><div class="meta"><span class="pill" style="border:1.5px solid var(--blue);background:transparent;color:var(--blue)">EJEMPLO</span>${estadoPill(p)}</div>${cerrarX}</div>
+   <div><div class="meta" style="margin-bottom:6px">${esc(p.owner_p.tipo_cliente)} · ${esc(p.localidad)}, ${esc(p.provincia)} · ${esc(p.modalidad)}</div><h2 id="dl-title">${esc(p.titulo)}</h2></div>
+   <div class="meta"><span class="pill">${esc(p.rubro)}</span><span class="pill">${esc(p.trabajo)}</span>${p.etiquetas.map(t => `<span class="pill">#${esc(t)}</span>`).join("")}</div>
+   <div><h4>Descripción</h4><p style="margin:0;max-width:65ch;white-space:pre-line">${esc(p.descripcion)}</p>${p.entregables ? `<p style="margin:8px 0 0;max-width:65ch"><b>Entregables:</b> ${esc(p.entregables)}</p>` : ""}</div>
+   <div><h4>Ficha del terreno</h4><div class="sheet">${ficha.map(([k, v]) => `<div><small>${k}</small><b>${esc(v)}</b></div>`).join("")}</div></div>
+   <div><h4>Propuestas</h4><div class="meta">${p.propuestas_enviadas} de ${p.max_propuestas} recibidas<div class="cupo" style="flex:1;max-width:240px">${cupo(p)}</div></div></div>
+   <div><h4>Preguntas públicas (${p.qa.length})</h4><div class="qa">${p.qa.map(x => `<div class="q">${esc(x.q)}<div class="a"><b>Respuesta:</b> ${esc(x.a)}</div></div>`).join("") || '<div class="note">Nadie preguntó todavía.</div>'}</div></div>
+   ${props.length ? `<div><h4>Así se ve una buena propuesta</h4><div style="display:grid;gap:10px">${props.map(x => `<div class="prop"><span class="stamp">EJEMPLO</span>
+      <div class="who2"><span class="av">${esc(iniciales(x.nom))}</span><div><b>${esc(x.nom)}</b><small>${esc(x.sub)}</small></div></div>
+      <div class="propnums"><span>Precio ${esc(x.precio)}</span><span>Plazo ${esc(x.plazo)}</span></div><pre>${esc(x.txt)}</pre></div>`).join("")}</div>
+      <p class="fine" style="margin-top:8px">En los proyectos reales, cada propuesta solo la ve quien publicó. Estas se muestran como ejemplo.</p></div>` : ""}
+   <div>${pie}</div>`);
 }
 function estadoProp(e) {
   return { revision: '<span class="pill none">En revisión de Proyecta Más</span>', correcciones: '<span class="pill first">Con correcciones</span>', enviada: '<span class="pill open">Enviada al cliente</span>', aceptada: '<span class="pill pm">¡Aceptada!</span>', descartada: '<span class="pill full">No seleccionada</span>' }[e] || e;
