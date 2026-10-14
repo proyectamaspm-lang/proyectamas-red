@@ -126,3 +126,5 @@ footer a{color:var(--muted)}
 .bellitem.nuevo span{font-weight:600}
 .bellitem small{color:var(--muted);font-size:12px}
 @media (max-width:640px){.belllist{position:fixed;left:12px;right:12px;top:72px;width:auto}}
+.pendbar{background:var(--yellow-soft);border-bottom:1px solid #f0d800}
+.pendbar .wrap{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;padding-block:10px;font-size:15px}

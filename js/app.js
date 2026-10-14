@@ -443,7 +443,9 @@ function bindPropuesta(p) {
   try { const d = JSON.parse(localStorage.getItem(bk) || "null"); if (d) { $("#pm").value = d.t || ""; $("#pp").value = d.p || ""; $("#pz").value = d.z || ""; } } catch { }
   ["#pm", "#pp", "#pz"].forEach(sel => $(sel).addEventListener("input", () => { try { localStorage.setItem(bk, JSON.stringify({ t: $("#pm").value, p: $("#pp").value, z: $("#pz").value })); } catch { } }));
   $("#pform").onsubmit = async e => {
-    e.preventDefault(); const b = $("#psend"); busy(b, true, "Enviando…"); $("#perr").hidden = true;
+    e.preventDefault(); const b = $("#psend"); $("#perr").hidden = true;
+    if (await bloqueoPorCalificar($("#perr"), "mandar propuestas")) return;
+    busy(b, true, "Enviando…");
     const rev = $("#rev").checked;
     try {
       await q(sb.from("propuestas").insert({ proyecto_id: p.id, pro: S.user.id, texto: $("#pm").value.trim(), precio: $("#pp").value.trim(), plazo: $("#pz").value.trim(), estado: rev ? "revision" : "enviada", firmante }));
@@ -502,6 +504,7 @@ async function prepPublicar() {
 ["#p-trabajo", "#p-sup"].forEach(s => $(s).addEventListener("change", () => estPub?.set($("#p-trabajo").value, +$("#p-sup").value)));
 $("#pubform").onsubmit = async e => {
   e.preventDefault(); const b = $("#pubsend"), err = $("#puberr"); err.hidden = true;
+  if (await bloqueoPorCalificar(err, "publicar proyectos nuevos")) return;
   const pend = $("#p-tag").value; if (pend) { addTag(pend); $("#p-tag").value = ""; }
   const n = id => { const v = $(id).value; return v === "" ? null : +v; };
   busy(b, true, "Publicando…");
@@ -637,9 +640,10 @@ function bindAcuerdo(root, recargar) {
 }
 async function bloqueCalificar(p, para, soyPro) {
   const ya = (await q(sb.from("calificaciones").select("id").eq("proyecto_id", p.id).eq("de", S.user.id))).length;
-  if (ya) return `<div class="okbox">¡Gracias por calificar! Tu calificación ya se ve en el perfil.</div>`;
+  if (ya) return `<div class="okbox">¡Gracias por calificar! Tu calificación se publica cuando la otra parte también califique. Hasta entonces ninguno de los dos ve lo que puso el otro.</div>`;
   const crits = soyPro ? [["claridad", "Claridad del pedido"], ["pago", "Pago en tiempo y forma"], ["respeto", "Respeto de lo acordado"]] : [["calidad", "Calidad del trabajo"], ["plazos", "Cumplimiento de plazos"], ["comunicacion", "Comunicación"]];
-  return `<form class="box" data-calif="${p.id}" data-para="${para}"><h5>${soyPro ? "Calificá al cliente" : "Calificá al profesional"}</h5>
+  return `<form class="box" data-calif="${p.id}" data-para="${para}" id="calif-${p.id}"><h5>${soyPro ? "Calificá al cliente" : "Calificá al profesional"}</h5>
+    <span class="fine" style="margin:0">Es obligatorio para los dos. Es a ciegas: la otra parte no ve lo que pusiste hasta que también califique, y una vez enviada no se puede cambiar.</span>
     ${crits.map(([k, l]) => `<div class="crit"><span>${l}</span><span class="stars" data-k="${k}">${[1, 2, 3, 4, 5].map(n => `<button type="button" data-n="${n}" aria-label="${n} de 5">★</button>`).join("")}</span></div>`).join("")}
     <div class="crit"><span><b>Fidelidad.</b> ${soyPro ? "¿Volverías a trabajar con este cliente?" : "¿Lo volverías a contratar?"}</span><span class="yn"><button type="button" data-fid="1">Sí</button><button type="button" data-fid="0">No</button></span></div>
     <input name="com" maxlength="1000" placeholder="Comentario (opcional, se publica)">
@@ -654,7 +658,7 @@ function bindCalificar(root, recargar) {
       e.preventDefault();
       if (Object.keys(v).length < 3 || fid === null) { toast("Completá las estrellas y la pregunta de fidelidad"); return; }
       const prom = Object.values(v).reduce((a, x) => a + x, 0) / 3;
-      try { await q(sb.from("calificaciones").insert({ proyecto_id: +f.dataset.calif, de: S.user.id, para: f.dataset.para, criterios: v, promedio: Math.round(prom * 100) / 100, fidelidad: fid, comentario: f.com.value.trim() || null })); toast("¡Gracias por calificar!"); recargar(); }
+      try { await q(sb.from("calificaciones").insert({ proyecto_id: +f.dataset.calif, de: S.user.id, para: f.dataset.para, criterios: v, promedio: Math.round(prom * 100) / 100, fidelidad: fid, comentario: f.com.value.trim() || null })); toast("¡Gracias por calificar!"); await revisarPendientes(); recargar(); }
       catch (er) { toast(errMsg(er)); }
     };
   });
@@ -1054,6 +1058,25 @@ function pedirOpinion(accion) {
 /* ---------- herramientas (WhatsApp) ---------- */
 $$("[data-wa]").forEach(a => a.href = waNico(`Hola, vengo de la Red Proyecta Más y quiero info sobre ${a.dataset.wa}.`));
 
+/* ---------- calificaciones pendientes (obligatorias) ---------- */
+S.pend = [];
+async function revisarPendientes() {
+  S.pend = [];
+  if (S.user) { const { data } = await sb.rpc("calificaciones_pendientes"); S.pend = data || []; }
+  let bar = $("#pendbar");
+  if (!S.pend.length) { if (bar) bar.remove(); return; }
+  if (!bar) { bar = document.createElement("div"); bar.id = "pendbar"; bar.className = "pendbar"; document.querySelector("main").prepend(bar); }
+  const x = S.pend[0], dest = x.soy_pro ? "mis-propuestas" : "mis-proyectos";
+  bar.innerHTML = `<div class="wrap"><span>⭐ Tenés que calificar <b>${esc(x.titulo)}</b>${S.pend.length > 1 ? ` y ${S.pend.length - 1} más` : ""}. Es obligatorio para seguir ${x.soy_pro ? "mandando propuestas" : "publicando proyectos"}.</span><a class="btn y sm" href="#${dest}">Calificar ahora</a></div>`;
+}
+async function bloqueoPorCalificar(errBox, accion) {
+  await revisarPendientes();
+  if (!S.pend.length) return false;
+  const x = S.pend[0];
+  errBox.innerHTML = `Antes de ${accion}, calificá <b>${esc(x.titulo)}</b>. Calificar es obligatorio para los dos. <a href="#${x.soy_pro ? "mis-propuestas" : "mis-proyectos"}" data-close>Ir a calificar</a>`;
+  errBox.hidden = false; return true;
+}
+
 /* ---------- notificaciones ---------- */
 let notifTimer = null;
 async function cargarNotif() {
@@ -1076,7 +1099,7 @@ async function abrirNotif() {
 $("#bell").onclick = e => { e.stopPropagation(); $("#umlist").hidden = true; abrirNotif(); };
 $("#bell-list").addEventListener("click", e => e.stopPropagation());
 document.addEventListener("click", () => { $("#bell-list").hidden = true; });
-function vigilarNotif() { clearInterval(notifTimer); cargarNotif(); if (S.user) notifTimer = setInterval(cargarNotif, 60000); }
+function vigilarNotif() { clearInterval(notifTimer); cargarNotif(); revisarPendientes(); if (S.user) notifTimer = setInterval(cargarNotif, 60000); }
 addEventListener("focus", () => S.user && cargarNotif());
 
 /* ---------- tutorial ---------- */
