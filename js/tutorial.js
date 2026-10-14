@@ -17,7 +17,8 @@
       { hash: "publicar", sel: "#p-loc", t: "Ubicación, plazo y presupuesto", x: "La localidad importa por el código de edificación. El plazo y el presupuesto son opcionales, pero ayudan a que te propongan algo que encaje." },
       { hash: "publicar", sel: "#chipin", t: "Etiquetas", x: "Palabras clave para que te encuentren: #vivienda, #reforma, #Revit, #steel frame. Escribí y apretá Enter, o tocá las sugeridas." },
       { hash: "publicar", sel: "#p-max", t: "Cuántas propuestas querés", x: "Cuando llegás a ese número el proyecto deja de recibir propuestas, así no te llenás de mensajes. Si ninguna te convence, lo reabrís con más cupos." },
-      { hash: "publicar", sel: "#pubsend", t: "Publicar", x: "Listo. Los profesionales pueden hacerte preguntas públicas (las respondés desde la ficha) y mandarte propuestas. Te avisamos por mail cada vez que llega algo." },
+      { hash: "publicar", sel: "#pubsend", t: "Publicar", x: "Listo. Los profesionales pueden hacerte consultas (solo las ven ustedes dos; las respondés desde la ficha) y mandarte propuestas. Si te preguntan lo mismo varias veces, sumá ese dato con «Editar proyecto». Te avisamos por mail cada vez que llega algo." },
+      { hash: "", sel: "#bell", t: "Tus avisos", x: "En la campanita te avisamos cuando llega una propuesta, una consulta o se completa tu cupo. También te llega por mail." },
       { hash: "", sel: "#umbtn", t: "Mis proyectos", x: "Desde tu menú entrás a Mis proyectos: ahí comparás propuestas, ves el perfil y las calificaciones de cada profesional y aceptás la que más te guste. Al aceptar se comparten los contactos." },
       { hash: "", sel: null, t: "Después de aceptar", x: "En el mismo lugar aparecen las etapas del acuerdo (anticipo, entrega, saldo) para que los dos vayan marcando el avance. Solo las ven ustedes dos. Al terminar, se califican mutuamente." }
     ],
@@ -25,7 +26,7 @@
     pro: [
       { hash: "", sel: null, t: "Bienvenido a la Red", x: "Acá encontrás proyectos de arquitectura, ingeniería y obra de todo el país y mandás tu propuesta. Te mostramos dónde está cada cosa y qué conviene poner en cada lugar." },
       { hash: "proyectos", sel: "#proyectos .filters, #proyectos .boardhead", t: "Buscar proyectos", x: "Filtrá por rubro, provincia o si todavía tienen cupo. La barrita de cada tarjeta muestra cuántas propuestas quedan disponibles." },
-      { hash: "proyectos", sel: "#grid .card, #grid", t: "La ficha del proyecto", x: "Tocá una tarjeta para ver medidas, descripción y preguntas. Si algo no está claro, preguntá antes de cotizar: la pregunta y la respuesta quedan públicas." },
+      { hash: "proyectos", sel: "#grid .card, #grid", t: "La ficha del proyecto", x: "Tocá una tarjeta para ver medidas, descripción y preguntas. Si algo no está claro, consultá antes de cotizar: la consulta y la respuesta solo las ven vos y quien publicó." },
       { hash: "", sel: null, t: "Tu propuesta, campo por campo", x: "En la ficha está el formulario. «Usar plantilla» te arma la estructura: cómo lo encararías, qué entregás, cuántas revisiones incluís y la forma de pago. Completá precio y plazo con números concretos. La primera vez que lo abras te guiamos por cada campo." },
       { hash: "", sel: null, t: "Revisión antes de enviar", x: "Si tildás «Que Proyecta Más revise mi propuesta», te devolvemos sugerencias en 24 h hábiles antes de que la vea el cliente. Muy recomendable para las primeras." },
       { hash: "kit", sel: "#primer-cliente", t: "Kit primer cliente", x: "10 manuales cortos (cómo cotizar, cómo escribir la propuesta, contratos, matriculación), una calculadora de valor hora y la reserva de llamadas de 30 minutos por Meet." },
@@ -36,6 +37,7 @@
       { hash: "perfil", sel: "#perfilbox .note, #perfilbox", t: "Sello Verificado", x: "Pedilo por WhatsApp con foto de tu DNI (y matrícula si tenés). Los perfiles verificados aparecen primero." },
       { hash: "mis-servicios", sel: "#svnew", t: "Servicios con precio cerrado", x: "Publicá trabajos que hagas seguido, con hasta 3 paquetes (Básico, Estándar, Completo). El cliente los pide directo, sin competir con otras propuestas." },
       { hash: "mis-propuestas", sel: "#v-mis-propuestas h1, #v-mis-propuestas h2", t: "Mis propuestas", x: "El estado de cada propuesta, las correcciones de la revisión y los trabajos aceptados con el contacto del cliente. Ahí también marcan las etapas del acuerdo, que solo ven ustedes dos, y se califican al terminar." },
+      { hash: "", sel: "#bell", t: "Tus avisos", x: "En la campanita te avisamos cuando responden tu consulta, te devolvemos correcciones o aceptan tu propuesta. También te llega por mail." },
       { hash: "herramientas", sel: "#beneficios", t: "Herramientas", x: "Planillas, software y manuales con descuento por transferencia o 3 cuotas sin interés. Consultás directo por WhatsApp." }
     ],
     /* formulario de propuesta (dentro de la ficha) */

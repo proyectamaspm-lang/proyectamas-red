@@ -105,3 +105,24 @@ footer a{color:var(--muted)}
 @media (prefers-reduced-motion:reduce){.tuto-luz,.tuto-bar i{transition:none}}
 .danger{border-color:#f3c9a3}
 .danger h2{color:var(--warn)}
+
+/* fotos de perfil */
+.av{overflow:hidden}
+.av img,.uav img{width:100%;height:100%;object-fit:cover;display:block}
+.av.big{width:84px;height:84px;font-size:34px}
+.fotobox{display:flex;gap:16px;align-items:center;margin-bottom:16px}
+.uav{width:26px;height:26px;border-radius:50%;background:#fff;display:grid;place-items:center;overflow:hidden;font:400 13px var(--f-logo);margin-left:-8px;flex:none}
+
+/* avisos */
+.bellwrap{position:relative}
+.bell{position:relative;width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--blue);display:grid;place-items:center;cursor:pointer}
+.bell:hover{border-color:var(--blue)}
+.bell .n{position:absolute;top:-4px;right:-4px;min-width:18px;height:18px;padding:0 5px;border-radius:999px;background:#d93025;color:#fff;font:700 11px/18px var(--f-body);text-align:center}
+.belllist{position:absolute;right:0;top:calc(100% + 6px);width:min(340px,calc(100vw - 24px));max-height:70vh;overflow:auto;background:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:0 10px 30px rgba(18,46,84,.15);z-index:30;padding:6px}
+.bellhead{display:flex;justify-content:space-between;align-items:center;padding:8px 10px}
+.bellitem{display:grid;gap:2px;padding:9px 10px;border-radius:10px;text-decoration:none;color:var(--ink);font-size:14px}
+.bellitem:hover{background:var(--tint)}
+.bellitem.nuevo{background:var(--yellow-soft)}
+.bellitem.nuevo span{font-weight:600}
+.bellitem small{color:var(--muted);font-size:12px}
+@media (max-width:640px){.belllist{position:fixed;left:12px;right:12px;top:72px;width:auto}}

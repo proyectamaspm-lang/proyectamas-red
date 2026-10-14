@@ -28,8 +28,12 @@
       <button class="btn o sm" type="button" id="vertuto">Ver tutorial</button>
       <button class="btn o sm" data-auth="in" data-when="guest">Ingresar</button>
       <button class="btn sm" data-auth="up" data-when="guest">Crear cuenta</button>
+      <div class="bellwrap" data-when="user" hidden>
+        <button type="button" class="bell" id="bell" aria-label="Avisos"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M12 22a2.5 2.5 0 0 0 2.45-2h-4.9A2.5 2.5 0 0 0 12 22Zm7-6V11a7 7 0 0 0-5.5-6.84V3.5a1.5 1.5 0 0 0-3 0v.66A7 7 0 0 0 5 11v5l-2 2v1h18v-1l-2-2Z"/></svg><span class="n" id="bell-n" hidden></span></button>
+        <div class="belllist" id="bell-list" hidden></div>
+      </div>
       <div class="usermenu" data-when="user" hidden>
-        <button class="memberchip" id="umbtn" aria-haspopup="true" aria-expanded="false"><span id="uname">Mi cuenta</span> <span id="urol" class="pill"></span></button>
+        <button class="memberchip" id="umbtn" aria-haspopup="true" aria-expanded="false"><span class="uav" id="uav"></span><span id="uname">Mi cuenta</span> <span id="urol" class="pill"></span></button>
         <div class="umlist" id="umlist" hidden>
           <a href="#mis-proyectos" data-when="cli admin">Mis proyectos</a>
           <a href="#mis-propuestas" data-when="pro admin">Mis propuestas</a>
@@ -85,7 +89,7 @@
         <div class="howcard">
           <header>Cómo funciona</header>
           <div class="step"><i>1</i><div><b>Publican el proyecto</b><span>Con medidas, etiquetas, plazo y cuántas propuestas quieren recibir.</span></div></div>
-          <div class="step"><i>2</i><div><b>Preguntás y proponés</b><span>Las preguntas quedan públicas. Tu propuesta la puede revisar Proyecta Más antes de enviarla.</span></div></div>
+          <div class="step"><i>2</i><div><b>Preguntás y proponés</b><span>Las consultas son privadas entre vos y quien publicó. Tu propuesta la puede revisar Proyecta Más antes de enviarla.</span></div></div>
           <div class="step"><i>3</i><div><b>Arreglan directo</b><span>Si aceptan tu propuesta, se comparten los contactos. Precio y pago entre ustedes.</span></div></div>
           <div class="step"><i>4</i><div><b>Sumás reseña y nivel</b><span>Cada proyecto entregado te acerca a Aliado Proyecta Más.</span></div></div>
         </div>
@@ -324,7 +328,7 @@
     </form>
     <aside class="aside">
       <div class="asidecard y"><b>Cuantos más datos, mejores propuestas</b><span>Las medidas del terreno, lo que ya tenés y qué entregables esperás evitan propuestas genéricas.</span></div>
-      <div class="asidecard"><b>Vas a recibir preguntas</b><span>Los profesionales pueden preguntar antes de proponer. Las respuestas quedan públicas.</span></div>
+      <div class="asidecard"><b>Vas a recibir preguntas</b><span>Los profesionales pueden consultarte antes de proponer. Cada consulta la ven solo ustedes dos.</span></div>
       <div class="asidecard"><b>Tus datos no se publican</b><span>Tu WhatsApp y tu email se comparten solo con el profesional cuya propuesta aceptes.</span></div>
     </aside>
   </div>

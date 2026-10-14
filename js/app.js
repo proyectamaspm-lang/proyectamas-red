@@ -51,6 +51,8 @@ const fecha = d => new Date(d).toLocaleDateString("es-AR", { day: "numeric", mon
 const waLink = (n, t = "") => { let d = String(n || "").replace(/\D/g, ""); if (d.startsWith("54")) d = d.slice(2); if (d.startsWith("9")) d = d.slice(1); return `https://wa.me/549${d}${t ? "?text=" + encodeURIComponent(t) : ""}`; };
 const waNico = t => `https://wa.me/${WA_NUM}?text=${encodeURIComponent(t)}`;
 const iniciales = n => String(n || "?").split(/\s+/).filter(Boolean).slice(0, 2).map(x => x[0]).join("").toUpperCase();
+const fotoUrl = path => sb.storage.from("portfolio").getPublicUrl(path).data.publicUrl;
+const avatar = (p, cls = "av") => p?.foto ? `<span class="${cls}"><img src="${esc(fotoUrl(p.foto))}" alt=""></span>` : `<span class="${cls}">${esc(iniciales(p?.nombre))}</span>`;
 const stars = v => { const r = Math.round(v || 0); return "★".repeat(r) + "☆".repeat(5 - r); };
 function toast(m) { const t = $("#toast"); t.textContent = m; t.hidden = false; clearTimeout(t._t); t._t = setTimeout(() => t.hidden = true, 3200); }
 function fill(sel, arr, keep) { const el = $(sel); if (!el) return; if (!keep) el.innerHTML = ""; arr.forEach(v => el.insertAdjacentHTML("beforeend", `<option>${esc(v)}</option>`)); }
@@ -77,7 +79,8 @@ async function q(promise) { const { data, error } = await promise; if (error) th
 function busy(btn, on, txt) { if (!btn) return; if (on) { btn._t = btn.textContent; btn.disabled = true; btn.textContent = txt || "Guardando…"; } else { btn.disabled = false; if (btn._t) btn.textContent = btn._t; } }
 function dialogo(html, id = "dlg") { const d = $("#" + id); $(id === "dlg" ? "#dlbody" : "#authbody").innerHTML = html; if (!d.open) d.showModal(); d.scrollTop = 0; $$("[data-close]", d).forEach(b => b.onclick = () => d.close()); return d; }
 const cerrarX = `<button class="x" data-close aria-label="Cerrar">✕</button>`;
-$$("dialog").forEach(d => d.addEventListener("click", e => { if (e.target === d) d.close(); }));
+/* Los diálogos solo se cierran con la X (o Cancelar): tocar afuera o Esc no borra lo escrito. */
+$$("dialog").forEach(d => d.addEventListener("cancel", e => e.preventDefault()));
 
 /* ---------- estado ---------- */
 const S = { user: null, me: null, contacto: null, proyectos: [], cfg: null, honor: [] };
@@ -108,7 +111,7 @@ function pintarSesion() {
   });
   $$(".pro-only").forEach(el => el.hidden = !esPro());
   $$(".pub-only").forEach(el => el.hidden = esPro());
-  if (S.me) { $("#uname").textContent = S.me.nombre.split(" ")[0]; $("#urol").textContent = { pro: "Profesional", cli: "Cliente", admin: "Admin" }[r]; }
+  if (S.me) { $("#uav").innerHTML = S.me.foto ? `<img src="${esc(fotoUrl(S.me.foto))}" alt="">` : esc(iniciales(S.me.nombre)); $("#uname").textContent = S.me.nombre.split(" ")[0]; $("#urol").textContent = { pro: "Profesional", cli: "Cliente", admin: "Admin" }[r]; }
 }
 let listo = false, uidPrevio;
 /* Nada de llamadas a Supabase dentro del aviso de sesión: se difieren para no trabar el cliente. */
@@ -117,7 +120,7 @@ sb.auth.onAuthStateChange((ev, session) => {
   const uid = session?.user?.id || null;
   if (!listo || uid === uidPrevio) return;
   uidPrevio = uid;
-  setTimeout(async () => { await cargarYo(); router(); if (uid) { tutoAuto(); agendaSiPro(); } }, 0);
+  setTimeout(async () => { await cargarYo(); router(); vigilarNotif(); if (uid) { tutoAuto(); agendaSiPro(); } }, 0);
 });
 $("#logout").onclick = async () => { await sb.auth.signOut(); location.hash = ""; toast("Cerraste sesión"); };
 $("#umbtn").onclick = e => { e.stopPropagation(); const l = $("#umlist"); l.hidden = !l.hidden; $("#umbtn").setAttribute("aria-expanded", String(!l.hidden)); };
@@ -273,7 +276,7 @@ function pintarTablero() {
      <p>${esc(p.descripcion)}</p>
      <div class="specs">${specs(p)}</div>
      <div class="tags">${p.etiquetas.map(t => `<span class="tag">#${esc(t)}</span>`).join("")}</div>
-     <div class="meta">${esc(p.owner_p?.tipo_cliente || "Particular")} · ${esc(p.modalidad)} · publicado ${ago(p.created_at)} · ${p.preguntas?.[0]?.count || 0} preguntas</div>
+     <div class="meta">${esc(p.owner_p?.tipo_cliente || "Particular")} · ${esc(p.modalidad)} · publicado ${ago(p.created_at)}</div>
     </div>
     <div class="rotulo">
      <div><small>Trabajo</small><b>${esc(p.trabajo)}</b></div>
@@ -300,10 +303,11 @@ async function abrirProyecto(id) {
   const owner = S.user && p.owner === S.user.id;
   const ficha = [["Frente", p.frente ? num(p.frente) + " m" : "—"], ["Fondo", p.fondo ? num(p.fondo) + " m" : "—"], ["Superficie", p.superficie ? num(p.superficie) + " m²" : "—"], ["Particularidad", p.particularidad || "—"], ["Plazo", p.plazo || "—"], ["Presupuesto", p.presupuesto || "No indicado"]];
   const qa = preguntas.map(x => `<div class="q">${esc(x.pregunta)} <small class="muted">· ${esc(x.autor_p?.nombre?.split(" ")[0] || "")}</small>
-      <div class="a">${x.respuesta ? `<b>Respuesta:</b> ${esc(x.respuesta)}` : owner ? `<form class="inline resp" data-q="${x.id}" style="margin-top:6px"><input required maxlength="1000" placeholder="Tu respuesta (queda pública)"><button class="btn o sm">Responder</button></form>` : "Esperando respuesta de quien publicó"}</div></div>`).join("");
+      <div class="a">${x.respuesta ? `<b>Respuesta:</b> ${esc(x.respuesta)}` : owner ? `<form class="inline resp" data-q="${x.id}" style="margin-top:6px"><input required maxlength="1000" placeholder="Tu respuesta (solo la ve quien preguntó)"><button class="btn o sm">Responder</button></form>` : "Esperando respuesta de quien publicó"}</div></div>`).join("");
   let accion = "";
   if (!S.user) accion = `<div class="pmbox"><b>¿Sos profesional?</b><span>Ingresá o creá tu cuenta gratis para preguntar y enviar tu propuesta.</span><div class="inline"><a class="btn y sm" href="#registro" data-close>Crear cuenta</a><button class="btn o sm" id="dl-in">Ingresar</button></div></div>`;
   else if (owner) accion = `<div class="note">Es tu proyecto. Las propuestas te llegan en <a href="#mis-proyectos" data-close>Mis proyectos</a>.</div>
+      ${["abierto", "completo"].includes(p.estado) ? `<div><button type="button" class="btn o sm" id="editp">Editar proyecto</button></div>` : ""}
       ${p.estado === "completo" ? `<div class="reopen"><b>Recibiste las ${p.max_propuestas} propuestas que pediste</b><span>¿No te convenció ninguna? Reabrí el proyecto para recibir más. Las que ya tenés se mantienen.</span>
       <div class="inline"><select id="reo" aria-label="Cupos a sumar"><option value="3">3 cupos más</option><option value="5" selected>5 cupos más</option><option value="10">10 cupos más</option></select><button type="button" class="btn sm" id="reobtn">Reabrir cupos</button></div></div>` : ""}`;
   else if (!esPro()) accion = `<div class="note">Solo los profesionales pueden enviar propuestas.</div>`;
@@ -319,15 +323,17 @@ async function abrirProyecto(id) {
    <div><h4>Descripción</h4><p style="margin:0;max-width:65ch;white-space:pre-line">${esc(p.descripcion)}</p>${p.entregables ? `<p style="margin:8px 0 0;max-width:65ch"><b>Entregables:</b> ${esc(p.entregables)}</p>` : ""}</div>
    <div><h4>Ficha del terreno</h4><div class="sheet">${ficha.map(([k, v]) => `<div><small>${k}</small><b>${esc(v)}</b></div>`).join("")}</div></div>
    <div><h4>Propuestas</h4><div class="meta">${p.propuestas_enviadas} de ${p.max_propuestas} recibidas<div class="cupo" style="flex:1;max-width:240px">${cupo(p)}</div></div></div>
-   <div><h4>Preguntas públicas (${preguntas.length})</h4><div class="qa">${qa || '<div class="note">Nadie preguntó todavía.</div>'}</div>
-    ${S.user && esPro() && !owner && p.estado === "abierto" ? `<form class="inline" id="qform" style="margin-top:10px"><input id="qin" required minlength="3" maxlength="500" placeholder="¿Hay plano de mensura? ¿Qué software preferís?" aria-label="Tu pregunta"><button class="btn o sm" type="submit">Preguntar</button></form>` : ""}</div>
+   ${owner || (S.user && esPro()) ? `<div><h4>${owner ? `Consultas recibidas (${preguntas.length})` : `Tus consultas (${preguntas.length})`}</h4>
+    <p class="fine" style="margin:0 0 8px">${owner ? "Solo las ven vos y quien pregunta. Si te preguntan lo mismo varias veces, sumá ese dato al proyecto con <b>Editar proyecto</b>." : "Solo las ven vos y quien publicó."}</p>
+    <div class="qa">${qa || `<div class="note">${owner ? "Todavía no te hicieron consultas." : "No hiciste consultas sobre este proyecto."}</div>`}</div>
+    ${S.user && esPro() && !owner && p.estado === "abierto" ? `<form class="inline" id="qform" style="margin-top:10px"><input id="qin" required minlength="3" maxlength="500" placeholder="¿Hay plano de mensura? ¿Qué software preferís?" aria-label="Tu consulta"><button class="btn o sm" type="submit">Consultar</button></form>` : ""}</div>` : ""}
    <div>${accion}</div>`);
 
   sb.rpc("indicadores", { p_perfiles: [p.owner] }).then(({ data }) => { const r = data?.[0]; if (r && $("#dl-rep")) $("#dl-rep").innerHTML = repHTML(r, "Quien publica"); });
   if ($("#dl-in")) $("#dl-in").onclick = () => { $("#dlg").close(); abrirIngreso(); };
   if ($("#qform")) $("#qform").onsubmit = async e => {
     e.preventDefault();
-    try { await q(sb.from("preguntas").insert({ proyecto_id: id, autor: S.user.id, pregunta: $("#qin").value.trim() })); toast("Pregunta publicada. Le avisamos a quien publicó."); abrirProyecto(id); }
+    try { await q(sb.from("preguntas").insert({ proyecto_id: id, autor: S.user.id, pregunta: $("#qin").value.trim() })); toast("Consulta enviada. Le avisamos a quien publicó."); abrirProyecto(id); }
     catch (er) { toast(errMsg(er)); }
   };
   $$(".resp").forEach(f => f.onsubmit = async e => {
@@ -335,12 +341,41 @@ async function abrirProyecto(id) {
     try { await q(sb.from("preguntas").update({ respuesta: $("input", f).value.trim() }).eq("id", +f.dataset.q)); toast("Respuesta publicada"); abrirProyecto(id); }
     catch (er) { toast(errMsg(er)); }
   });
+  if ($("#editp")) $("#editp").onclick = () => editarProyecto(p);
   if ($("#reobtn")) $("#reobtn").onclick = async () => {
     try { await q(sb.rpc("reabrir_cupos", { p_proyecto: id, p_extra: +$("#reo").value })); toast("Cupos reabiertos"); cargarProyectos(); abrirProyecto(id); }
     catch (er) { toast(errMsg(er)); }
   };
   if ($("#pform")) bindPropuesta(p);
 }
+/* editar un proyecto publicado (solo el dueño) */
+function editarProyecto(p) {
+  const v = x => esc(x ?? "");
+  dialogo(`<div class="dlhead"><div><div class="eyebrow">Tu proyecto</div><h2 id="dl-title" style="margin-top:4px">Editar proyecto</h2></div>${cerrarX}</div>
+    <p class="fine" style="margin:0">Sumá lo que te consultan seguido, así los profesionales lo ven sin tener que preguntar. El rubro, el tipo de trabajo y la ubicación no se cambian.</p>
+    <form id="epf" style="display:grid;gap:12px">
+      <label class="f">Título<input name="titulo" required minlength="5" maxlength="120" value="${v(p.titulo)}"></label>
+      <label class="f">Descripción<textarea name="descripcion" required maxlength="4000" style="min-height:140px">${v(p.descripcion)}</textarea></label>
+      <label class="f">Entregables esperados<input name="entregables" maxlength="400" value="${v(p.entregables)}"></label>
+      <div class="row"><label class="f">Frente (m)<input name="frente" type="number" step="0.01" min="0" value="${v(p.frente)}"></label><label class="f">Fondo (m)<input name="fondo" type="number" step="0.01" min="0" value="${v(p.fondo)}"></label><label class="f">Sup. (m²)<input name="superficie" type="number" step="1" min="0" value="${v(p.superficie)}"></label></div>
+      <label class="f">Desnivel u otra particularidad<input name="particularidad" maxlength="200" value="${v(p.particularidad)}"></label>
+      <div class="row"><label class="f">Plazo<input name="plazo" maxlength="60" value="${v(p.plazo)}"></label><label class="f">Presupuesto<input name="presupuesto" maxlength="60" value="${v(p.presupuesto)}"></label></div>
+      <label class="f">Etiquetas <small>Separadas por coma</small><input name="etiquetas" maxlength="300" value="${v(p.etiquetas.join(", "))}"></label>
+      <div class="formerr" id="eperr" hidden></div>
+      <div class="inline"><button class="btn" type="submit">Guardar cambios</button><button type="button" class="btn o" id="epcancel">Cancelar</button></div>
+    </form>`);
+  $("#epcancel").onclick = () => abrirProyecto(p.id);
+  $("#epf").onsubmit = async e => {
+    e.preventDefault(); const f = e.target; const n = x => x.value === "" ? null : +x.value;
+    const row = { titulo: f.titulo.value.trim(), descripcion: f.descripcion.value.trim(), entregables: f.entregables.value.trim() || null,
+      frente: n(f.frente), fondo: n(f.fondo), superficie: n(f.superficie), particularidad: f.particularidad.value.trim() || null,
+      plazo: f.plazo.value.trim() || null, presupuesto: f.presupuesto.value.trim() || null,
+      etiquetas: f.etiquetas.value.split(",").map(t => t.trim().replace(/^#/, "")).filter(Boolean).slice(0, 8) };
+    try { await q(sb.from("proyectos").update(row).eq("id", p.id)); toast("Proyecto actualizado"); await cargarProyectos(); abrirProyecto(p.id); }
+    catch (er) { $("#eperr").textContent = errMsg(er); $("#eperr").hidden = false; }
+  };
+}
+
 /* ficha de un proyecto de ejemplo: solo lectura */
 function abrirEjemplo(id) {
   const p = (window.EJEMPLOS || []).find(x => x.id === id);
@@ -357,7 +392,7 @@ function abrirEjemplo(id) {
    <div><h4>Descripción</h4><p style="margin:0;max-width:65ch;white-space:pre-line">${esc(p.descripcion)}</p>${p.entregables ? `<p style="margin:8px 0 0;max-width:65ch"><b>Entregables:</b> ${esc(p.entregables)}</p>` : ""}</div>
    <div><h4>Ficha del terreno</h4><div class="sheet">${ficha.map(([k, v]) => `<div><small>${k}</small><b>${esc(v)}</b></div>`).join("")}</div></div>
    <div><h4>Propuestas</h4><div class="meta">${p.propuestas_enviadas} de ${p.max_propuestas} recibidas<div class="cupo" style="flex:1;max-width:240px">${cupo(p)}</div></div></div>
-   <div><h4>Preguntas públicas (${p.qa.length})</h4><div class="qa">${p.qa.map(x => `<div class="q">${esc(x.q)}<div class="a"><b>Respuesta:</b> ${esc(x.a)}</div></div>`).join("") || '<div class="note">Nadie preguntó todavía.</div>'}</div></div>
+   <div><h4>Consultas (${p.qa.length})</h4><div class="qa">${p.qa.map(x => `<div class="q">${esc(x.q)}<div class="a"><b>Respuesta:</b> ${esc(x.a)}</div></div>`).join("") || '<div class="note">Nadie preguntó todavía.</div>'}</div></div>
    ${props.length ? `<div><h4>Así se ve una buena propuesta</h4><div style="display:grid;gap:10px">${props.map(x => `<div class="prop"><span class="stamp">EJEMPLO</span>
       <div class="who2"><span class="av">${esc(iniciales(x.nom))}</span><div><b>${esc(x.nom)}</b><small>${esc(x.sub)}</small></div></div>
       <div class="propnums"><span>Precio ${esc(x.precio)}</span><span>Plazo ${esc(x.plazo)}</span></div><pre>${esc(x.txt)}</pre></div>`).join("")}</div>
@@ -379,7 +414,7 @@ function formPropuesta(p) {
      <label class="f"><span style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;align-items:center">Tu propuesta <button type="button" class="btn o sm" id="tpl">Usar plantilla Proyecta Más</button></span><small>Cómo lo encararías, qué entregás, cuántas revisiones incluís</small><textarea id="pm" required minlength="20" maxlength="5000" style="min-height:160px"></textarea></label>
      <div class="row"><label class="f">Precio total<input id="pp" required maxlength="60" placeholder="$450.000"></label><label class="f">Plazo<input id="pz" required maxlength="60" placeholder="20 días"></label></div>
      <div id="est-prop" class="est est-inline"></div>
-     <div class="box"><h5>¿Necesitás que alguien firme?</h5><span class="fine" style="margin:0">Si el trabajo requiere firma de un matriculado con otra incumbencia, sumalo a tu propuesta. El cliente lo ve con su título y matrícula.</span>
+     <div class="box"><h5>¿Necesitás que alguien firme?</h5><span class="fine" style="margin:0">Es un acuerdo interno entre profesionales: el cliente no lo ve. Si el trabajo necesita la firma de un matriculado con otra incumbencia, buscalo en la Red; si no encontrás a nadie, coordinalo con alguien de afuera.</span>
       <div id="firmasel"></div><input id="fbus" placeholder="Buscar profesional por nombre" aria-label="Buscar firmante"><div class="picklist" id="fpick"></div></div>
      <label class="check"><input type="checkbox" id="rev" checked> <span><b>Que Proyecta Más revise mi propuesta antes de enviarla.</b> Te devolvemos sugerencias en 24 h hábiles.</span></label>
      <div class="note">Si quien publica acepta tu propuesta, se comparten los contactos y acuerdan el pago por fuera de la Red.</div>
@@ -387,9 +422,10 @@ function formPropuesta(p) {
      <div><button class="btn y" type="submit" id="psend">Enviar propuesta</button></div>
     </form></div>`;
 }
+function confirmarReemplazo() { return window.confirm ? confirm("¿Reemplazar lo que escribiste por la plantilla?") : true; }
 function bindPropuesta(p) {
   let firmante = null;
-  $("#tpl").onclick = () => { $("#pm").value = TEMPLATE.replace("[nombre]", S.me.nombre.split(" ")[0]).replace("[título]", S.me.titulo || "profesional"); $("#pm").focus(); };
+  $("#tpl").onclick = () => { if ($("#pm").value.trim() && !confirmarReemplazo()) return; $("#pm").value = TEMPLATE.replace("[nombre]", S.me.nombre.split(" ")[0]).replace("[título]", S.me.titulo || "profesional"); $("#pm").focus(); };
   montarEstimador($("#est-prop"), { trabajo: p.trabajo, cantidad: p.superficie, compacto: true, titulo: "Referencia de honorarios para este trabajo" });
   let t;
   $("#fbus").oninput = () => {
@@ -402,11 +438,16 @@ function bindPropuesta(p) {
     }, 250);
   };
   window.tutorial?.autoPropuesta();
+  /* borrador: lo escrito se guarda en este navegador hasta que se envía */
+  const bk = "borrador-propuesta-" + p.id;
+  try { const d = JSON.parse(localStorage.getItem(bk) || "null"); if (d) { $("#pm").value = d.t || ""; $("#pp").value = d.p || ""; $("#pz").value = d.z || ""; } } catch { }
+  ["#pm", "#pp", "#pz"].forEach(sel => $(sel).addEventListener("input", () => { try { localStorage.setItem(bk, JSON.stringify({ t: $("#pm").value, p: $("#pp").value, z: $("#pz").value })); } catch { } }));
   $("#pform").onsubmit = async e => {
     e.preventDefault(); const b = $("#psend"); busy(b, true, "Enviando…"); $("#perr").hidden = true;
     const rev = $("#rev").checked;
     try {
       await q(sb.from("propuestas").insert({ proyecto_id: p.id, pro: S.user.id, texto: $("#pm").value.trim(), precio: $("#pp").value.trim(), plazo: $("#pz").value.trim(), estado: rev ? "revision" : "enviada", firmante }));
+      try { localStorage.removeItem("borrador-propuesta-" + p.id); } catch { }
       toast(rev ? "Enviada a revisión. Seguila en Mis propuestas" : "Propuesta enviada al cliente");
       $("#dlg").close(); cargarProyectos(); pedirOpinion("propuesta");
     } catch (er) { $("#perr").textContent = errMsg(er); $("#perr").hidden = false; busy(b, false); }
@@ -482,7 +523,7 @@ let proCache = null;
 async function cargarProfesionales() {
   if (!proCache) {
     try {
-      const pros = await q(sb.from("perfiles").select("id,nombre,titulo,egreso,matricula,matricula_verificada,verificado,provincia,localidad,especialidades,portfolio,nivel").eq("rol", "pro").order("verificado", { ascending: false }).order("created_at").limit(300));
+      const pros = await q(sb.from("perfiles").select("id,nombre,titulo,egreso,matricula,matricula_verificada,verificado,provincia,localidad,especialidades,portfolio,nivel,foto").eq("rol", "pro").order("verificado", { ascending: false }).order("created_at").limit(300));
       const ids = pros.map(p => p.id);
       const [ind, port] = ids.length ? await Promise.all([q(sb.rpc("indicadores", { p_perfiles: ids.slice(0, 100) })), q(sb.from("portfolio").select("pro,imagen_path,titulo,orden").in("pro", ids).order("orden"))]) : [[], []];
       const im = Object.fromEntries(ind.map(r => [r.perfil, r]));
@@ -505,7 +546,7 @@ function pintarProfesionales() {
   const qq = $("#pq").value.trim().toLowerCase(), pv = $("#pf-prov").value, ver = $("#p-ver").checked;
   const list = (proCache || []).filter(p => (!qq || (p.nombre + " " + (p.titulo || "") + " " + (p.especialidades || "")).toLowerCase().includes(qq)) && (!pv || p.provincia === pv) && (!ver || p.verificado));
   $("#progrid").innerHTML = list.length ? list.map(p => `<button class="pcard" data-pro="${p.id}">
-    <div class="phead"><span class="av">${esc(iniciales(p.nombre))}</span><div style="min-width:0"><b>${esc(p.nombre)}</b><small>${esc(p.titulo || "Profesional")}${p.egreso ? " · " + esc(p.egreso) : ""} · ${esc(p.localidad || "")}${p.provincia ? ", " + esc(p.provincia) : ""}</small></div></div>
+    <div class="phead">${avatar(p)}<div style="min-width:0"><b>${esc(p.nombre)}</b><small>${esc(p.titulo || "Profesional")}${p.egreso ? " · " + esc(p.egreso) : ""} · ${esc(p.localidad || "")}${p.provincia ? ", " + esc(p.provincia) : ""}</small></div></div>
     <div class="meta">${sellos(p)}</div>
     ${p.especialidades ? `<p class="muted" style="margin:0;font-size:14px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${esc(p.especialidades)}</p>` : ""}
     ${p.fotos.length ? `<div class="thumbs">${p.fotos.slice(0, 3).map(f => `<img src="${esc(foto(f.imagen_path))}" alt="${esc(f.titulo)}" loading="lazy">`).join("")}</div>` : ""}
@@ -524,7 +565,7 @@ async function abrirPerfil(id) {
       q(sb.rpc("indicadores", { p_perfiles: [id] }))
     ]);
     if (!p || p.rol === "cli") { dialogo(`<div class="dlhead"><h2>Perfil no disponible</h2>${cerrarX}</div>`); return; }
-    dialogo(`<div class="dlhead"><div class="phead"><span class="av">${esc(iniciales(p.nombre))}</span><div><h2 id="dl-title" style="margin:0">${esc(p.nombre)}</h2><small class="muted">${esc(p.titulo || "Profesional")}${p.egreso ? " · egreso " + esc(p.egreso) : ""} · ${esc(p.localidad || "")}${p.provincia ? ", " + esc(p.provincia) : ""}</small></div></div>${cerrarX}</div>
+    dialogo(`<div class="dlhead"><div class="phead">${avatar(p)}<div><h2 id="dl-title" style="margin:0">${esc(p.nombre)}</h2><small class="muted">${esc(p.titulo || "Profesional")}${p.egreso ? " · egreso " + esc(p.egreso) : ""} · ${esc(p.localidad || "")}${p.provincia ? ", " + esc(p.provincia) : ""}</small></div></div>${cerrarX}</div>
       <div class="meta">${sellos(p)}</div>${statsHTML(ind[0])}
       ${p.especialidades ? `<div><h4>Especialidades</h4><p style="margin:0;white-space:pre-line">${esc(p.especialidades)}</p></div>` : ""}
       ${p.portfolio ? `<p style="margin:0"><a href="${esc(/^https?:\/\//.test(p.portfolio) ? p.portfolio : "https://" + p.portfolio)}" target="_blank" rel="noopener nofollow">Ver portfolio externo ↗</a></p>` : ""}
@@ -596,7 +637,7 @@ function bindAcuerdo(root, recargar) {
 }
 async function bloqueCalificar(p, para, soyPro) {
   const ya = (await q(sb.from("calificaciones").select("id").eq("proyecto_id", p.id).eq("de", S.user.id))).length;
-  if (ya) return `<div class="okbox">Ya calificaste. La nota se publica cuando califique la otra parte (o a los 14 días).</div>`;
+  if (ya) return `<div class="okbox">¡Gracias por calificar! Tu calificación ya se ve en el perfil.</div>`;
   const crits = soyPro ? [["claridad", "Claridad del pedido"], ["pago", "Pago en tiempo y forma"], ["respeto", "Respeto de lo acordado"]] : [["calidad", "Calidad del trabajo"], ["plazos", "Cumplimiento de plazos"], ["comunicacion", "Comunicación"]];
   return `<form class="box" data-calif="${p.id}" data-para="${para}"><h5>${soyPro ? "Calificá al cliente" : "Calificá al profesional"}</h5>
     ${crits.map(([k, l]) => `<div class="crit"><span>${l}</span><span class="stars" data-k="${k}">${[1, 2, 3, 4, 5].map(n => `<button type="button" data-n="${n}" aria-label="${n} de 5">★</button>`).join("")}</span></div>`).join("")}
@@ -629,7 +670,7 @@ async function misProyectos() {
     if (!proys.length) { box.innerHTML = `<div class="empty">Todavía no publicaste proyectos. <a href="#publicar">Publicá el primero</a> o <a href="#servicios">pedí un servicio</a>.</div>`; return; }
     const ids = proys.map(p => p.id);
     const [props, sols] = await Promise.all([
-      q(sb.from("propuestas").select("*, pro_p:perfiles!propuestas_pro_fkey(id,nombre,titulo,verificado,matricula,matricula_verificada), fir_p:perfiles!propuestas_firmante_fkey(nombre,titulo,matricula,matricula_verificada)").in("proyecto_id", ids).in("estado", ["enviada", "aceptada", "descartada"])),
+      q(sb.from("propuestas").select("*, pro_p:perfiles!propuestas_pro_fkey(id,nombre,titulo,verificado,matricula,matricula_verificada,foto)").in("proyecto_id", ids).in("estado", ["enviada", "aceptada", "descartada"])),
       q(sb.from("preguntas").select("proyecto_id").in("proyecto_id", ids).is("respuesta", null))
     ]);
     const ind = props.length ? Object.fromEntries((await q(sb.rpc("indicadores", { p_perfiles: [...new Set(props.map(x => x.pro))] }))).map(r => [r.perfil, r])) : {};
@@ -651,9 +692,8 @@ async function misProyectos() {
         ${contacto}${acuerdo}${calif}
         ${p.origen === "publicado" ? `<h4 class="h4b">Propuestas recibidas (${ps.length})</h4>
         ${ps.length ? `<div class="rlist">${ps.map(r => `<div class="prop ${r.estado === "aceptada" ? "pmp" : ""} ${r.estado === "descartada" ? "desc" : ""}">
-          <div class="who2"><span class="av">${esc(iniciales(r.pro_p.nombre))}</span><div><a href="#pro-${r.pro}"><b>${esc(r.pro_p.nombre)}</b></a> ${r.pro_p.verificado ? '<span class="badge ok">✓ Verificado</span>' : ""}<small>${esc(r.pro_p.titulo || "")}</small>${repHTML(ind[r.pro], "Profesional")}</div></div>
+          <div class="who2">${avatar(r.pro_p)}<div><a href="#pro-${r.pro}"><b>${esc(r.pro_p.nombre)}</b></a> ${r.pro_p.verificado ? '<span class="badge ok">✓ Verificado</span>' : ""}<small>${esc(r.pro_p.titulo || "")}</small>${repHTML(ind[r.pro], "Profesional")}</div></div>
           <div class="propnums"><span>Precio ${esc(r.precio)}</span><span>Plazo ${esc(r.plazo)}</span>${r.estado !== "enviada" ? `<span>${r.estado === "aceptada" ? "Aceptada" : "No seleccionada"}</span>` : ""}</div>
-          ${r.firmante && r.firmante_estado === "aceptado" ? `<div class="firma">Firma: <b>${esc(r.fir_p.nombre)}</b> · ${esc(r.fir_p.titulo || "")} ${r.fir_p.matricula ? `· ${esc(r.fir_p.matricula)}${r.fir_p.matricula_verificada ? ' <span class="badge mat">verificada</span>' : ""}` : ""}</div>` : ""}
           <pre>${esc(r.texto)}</pre>
           ${!acc && r.estado === "enviada" && p.owner === S.user.id ? `<div class="inline"><button type="button" class="btn y sm" data-acc="${r.id}" data-n="${esc(r.pro_p.nombre)}">Aceptar propuesta</button></div>` : ""}
         </div>`).join("")}</div>` : '<div class="note">Todavía no recibiste propuestas. Te avisamos por mail cuando llegue la primera.</div>'}` : ""}
@@ -767,6 +807,9 @@ async function miPerfil() {
   box.innerHTML = `<div class="eyebrow">Tu cuenta</div><h2 class="big">Mi <mark>perfil</mark></h2>
     <div class="meta">${pro ? sellos(m) || '<span class="badge warn">Sin verificar</span>' : ""}${pro ? `<a href="#pro-${m.id}">Ver mi perfil público</a>` : ""}</div>
     ${pro && !m.verificado ? `<div class="note">Para obtener el sello <b>Verificado</b>, mandanos por WhatsApp una foto de tu DNI y, si tenés, de tu credencial de matrícula. <a class="btn wa sm" target="_blank" rel="noopener" href="${waNico(`Hola, soy ${m.nombre} y quiero verificar mi perfil en la Red Proyecta Más.`)}">Pedir verificación</a></div>` : ""}
+    <div class="formbox fotobox" style="max-width:820px">${avatar(m, "av big")}
+      <div style="display:grid;gap:6px"><b>Tu foto</b><span class="fine" style="margin:0">Una foto de tu cara, clara y de frente, genera más confianza${pro ? " y te ayuda a conseguir más trabajos" : ""}. JPG, PNG o WEBP, hasta 5 MB.</span>
+      <div class="inline"><label class="btn o sm" style="cursor:pointer">${m.foto ? "Cambiar foto" : "Subir foto"}<input type="file" id="fotoin" accept="image/jpeg,image/png,image/webp" hidden></label>${m.foto ? `<button type="button" class="linkbtn" id="fotodel">Quitar</button>` : ""}</div></div></div>
     <form id="pf" class="formbox" style="max-width:820px">
       <div class="row"><label class="f">${pro ? "Nombre y apellido" : "Nombre o razón social"}<input name="nombre" required minlength="2" maxlength="120" value="${esc(m.nombre)}"></label>
         <label class="f">WhatsApp<input name="wa" required maxlength="30" value="${esc(c.whatsapp || "")}"></label></div>
@@ -786,6 +829,23 @@ async function miPerfil() {
     ${m.rol !== "admin" ? `<div class="formbox danger" style="max-width:820px;margin-top:16px"><h2 style="font:700 20px var(--f-body);margin:0">Eliminar mi cuenta</h2>
       <p class="fine" style="margin:0">Se borran tu perfil, tus datos de contacto${pro ? ", tus propuestas, tus trabajos del portfolio, tus servicios" : ", tus proyectos con sus preguntas y propuestas"} y tus calificaciones. No se puede deshacer. Si tenés un trabajo en curso, primero terminalo o cerralo.</p>
       <div><button type="button" class="btn o sm" id="delacc">Eliminar mi cuenta</button></div></div>` : ""}`;
+  $("#fotoin").onchange = async e => {
+    const file = e.target.files[0]; if (!file) return;
+    if (file.size > 5 * 1024 * 1024) { toast("La foto pesa más de 5 MB. Achicala y probá de nuevo."); return; }
+    const ext = (file.type.split("/")[1] || "jpg").replace("jpeg", "jpg");
+    const path = `${S.user.id}/foto-${Date.now()}.${ext}`;
+    try {
+      await q(sb.storage.from("portfolio").upload(path, file, { contentType: file.type }));
+      const vieja = S.me.foto;
+      await q(sb.from("perfiles").update({ foto: path }).eq("id", S.user.id));
+      if (vieja) sb.storage.from("portfolio").remove([vieja]);
+      await cargarYo(); proCache = null; toast("Foto actualizada"); miPerfil();
+    } catch (er) { toast(errMsg(er)); }
+  };
+  if ($("#fotodel")) $("#fotodel").onclick = async () => {
+    try { const vieja = S.me.foto; await q(sb.from("perfiles").update({ foto: null }).eq("id", S.user.id)); if (vieja) sb.storage.from("portfolio").remove([vieja]); await cargarYo(); proCache = null; miPerfil(); }
+    catch (er) { toast(errMsg(er)); }
+  };
   $("#pf").onsubmit = async e => {
     e.preventDefault(); const f = e.target;
     const row = { nombre: f.nombre.value.trim(), provincia: f.prov.value, localidad: f.loc.value.trim() };
@@ -994,6 +1054,31 @@ function pedirOpinion(accion) {
 /* ---------- herramientas (WhatsApp) ---------- */
 $$("[data-wa]").forEach(a => a.href = waNico(`Hola, vengo de la Red Proyecta Más y quiero info sobre ${a.dataset.wa}.`));
 
+/* ---------- notificaciones ---------- */
+let notifTimer = null;
+async function cargarNotif() {
+  if (!S.user) { $("#bell").hidden = true; return; }
+  const { count } = await sb.from("notificaciones").select("id", { count: "exact", head: true }).eq("para", S.user.id).eq("leida", false);
+  const n = count || 0; $("#bell-n").textContent = n > 9 ? "9+" : n; $("#bell-n").hidden = !n;
+  $("#bell").setAttribute("aria-label", n ? `Avisos: ${n} sin leer` : "Avisos");
+}
+async function abrirNotif() {
+  const l = $("#bell-list"); l.hidden = !l.hidden; if (l.hidden) return;
+  l.innerHTML = `<div class="muted" style="padding:10px">Cargando…</div>`;
+  const { data } = await sb.from("notificaciones").select("*").eq("para", S.user.id).order("created_at", { ascending: false }).limit(25);
+  const rows = data || [];
+  l.innerHTML = `<div class="bellhead"><b>Avisos</b>${rows.some(r => !r.leida) ? `<button type="button" class="linkbtn" id="bell-all">Marcar todo leído</button>` : ""}</div>`
+    + (rows.length ? rows.map(r => `<a href="${esc(r.link || "#")}" class="bellitem ${r.leida ? "" : "nuevo"}" data-nid="${r.id}"><span>${esc(r.titulo)}</span><small>${ago(r.created_at)}</small></a>`).join("")
+      : `<div class="muted" style="padding:12px">No tenés avisos todavía.</div>`);
+  $$("[data-nid]", l).forEach(a => a.onclick = async () => { l.hidden = true; if (a.classList.contains("nuevo")) { await sb.from("notificaciones").update({ leida: true }).eq("id", +a.dataset.nid); cargarNotif(); } });
+  if ($("#bell-all")) $("#bell-all").onclick = async e => { e.stopPropagation(); await sb.from("notificaciones").update({ leida: true }).eq("para", S.user.id).eq("leida", false); l.hidden = true; cargarNotif(); };
+}
+$("#bell").onclick = e => { e.stopPropagation(); $("#umlist").hidden = true; abrirNotif(); };
+$("#bell-list").addEventListener("click", e => e.stopPropagation());
+document.addEventListener("click", () => { $("#bell-list").hidden = true; });
+function vigilarNotif() { clearInterval(notifTimer); cargarNotif(); if (S.user) notifTimer = setInterval(cargarNotif, 60000); }
+addEventListener("focus", () => S.user && cargarNotif());
+
 /* ---------- tutorial ---------- */
 const tutoClave = () => !S.user ? "visita" : esPro() ? "pro" : "cli";
 $("#vertuto").onclick = () => { $("#umlist").hidden = true; window.tutorial?.abrir(tutoClave()); };
@@ -1010,6 +1095,7 @@ function agendaSiPro() { if (!esPro()) return; agenda(); if (!estMain) { estMain
   uidPrevio = S.user?.id || null; listo = true;
   await cargarProyectos();
   router();
+  vigilarNotif();
   if (LINK_ERR && !S.user) reenviarActivacion("", /expired|invalid/i.test(LINK_ERR.code + LINK_ERR.desc) ? "Ese link ya venció o ya se usó" : "No pudimos activar la cuenta con ese link");
   else tutoAuto();
   agendaSiPro();
