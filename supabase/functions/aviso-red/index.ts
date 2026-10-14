@@ -1,7 +1,9 @@
-// Avisos de la Red Proyecta Más: mail + notificación dentro de la Red.
+// Avisos de la Red Proyecta Más: notificación en la Red + push al celular, y mail solo en lo imprescindible
+// (cuando se comparten datos de contacto, la primera propuesta y el cupo completo; a Proyecta Más, las revisiones).
 // Recibe {tabla, id, evento, uid?}. No confía en el pedido: relee el registro con permisos de servidor,
 // verifica que el evento coincida con el estado real y registra cada aviso una sola vez (avisos_log).
 import { createClient } from "npm:@supabase/supabase-js@2.45.4";
+import webpush from "npm:web-push@3.6.7";
 
 const SITIO = "https://red.proyectamas.com.ar";
 const ADMIN_MAIL = "hola@proyectamas.com.ar";
@@ -22,7 +24,7 @@ function plantilla(titulo: string, cuerpo: string, boton?: [string, string]) {
   <p style="color:#5a6a85;font-size:12px;margin-top:24px">Red Proyecta Más · red.proyectamas.com.ar</p></div>`;
 }
 
-type Aviso = { para: string; email?: string; subject: string; html: string; notif: string; link: string };
+type Aviso = { para: string; email?: string; subject: string; html: string; notif: string; link: string; mail: boolean };
 
 Deno.serve(async (req) => {
   if (req.method !== "POST") return new Response("método no permitido", { status: 405 });
@@ -45,10 +47,10 @@ Deno.serve(async (req) => {
   const proyecto = async (pid: number) => (await db.from("proyectos").select("*").eq("id", pid).maybeSingle()).data;
   const link = (path: string) => SITIO + path;
   const avisos: Aviso[] = [];
-  const a = (who: Record<string, string> | "ADMIN", subject: string, html: string, notif: string, path: string) =>
+  const a = (who: Record<string, string> | "ADMIN", subject: string, html: string, notif: string, path: string, mail = false) =>
     avisos.push(who === "ADMIN"
-      ? { para: "ADMIN", email: ADMIN_MAIL, subject, html, notif, link: path }
-      : { para: who.id, email: who.email, subject, html, notif, link: path });
+      ? { para: "ADMIN", email: ADMIN_MAIL, subject, html, notif, link: path, mail }
+      : { para: who.id, email: who.email, subject, html, notif, link: path, mail });
   const claveBase = `${tabla}:${id || uid}:${evento}`;
 
   try {
@@ -58,25 +60,25 @@ Deno.serve(async (req) => {
       const p = await proyecto(pr.proyecto_id); const pro = await perfil(pr.pro); const cli = await perfil(p.owner);
       if (evento === "propuesta_revision" && pr.estado === "revision")
         a("ADMIN", `Propuesta para revisar: ${p.titulo}`, plantilla("Hay una propuesta para revisar", `<p><b>${esc(pro.nombre)}</b> mandó una propuesta para <b>${esc(p.titulo)}</b> y pidió tu revisión.</p><p>Precio ${esc(pr.precio)} · Plazo ${esc(pr.plazo)}</p>`, ["Abrir el panel", link("/#panel")]),
-          `Propuesta para revisar de ${pro.nombre}: ${p.titulo}`, "/#panel");
+          `Propuesta para revisar de ${pro.nombre}: ${p.titulo}`, "/#panel", true);
       if (evento === "propuesta_correcciones" && pr.estado === "correcciones")
         a(pro, "Tenés correcciones en tu propuesta", plantilla("Revisamos tu propuesta", `<p>Dejamos algunas correcciones para tu propuesta en <b>${esc(p.titulo)}</b>. Corregila y enviala al cliente desde <b>Mis propuestas</b>.</p>`, ["Ver correcciones", link("/#mis-propuestas")]),
           `Tenés correcciones en tu propuesta para ${p.titulo}`, "/#mis-propuestas");
       if (evento === "propuesta_enviada" && pr.estado === "enviada") {
         a(cli, `Recibiste una propuesta para ${p.titulo}`, plantilla("Recibiste una propuesta", `<p><b>${esc(pro.nombre)}</b> (${esc(pro.titulo || "profesional")}) te mandó una propuesta para <b>${esc(p.titulo)}</b>.</p><p>Precio ${esc(pr.precio)} · Plazo ${esc(pr.plazo)}</p><p>Llevás ${p.propuestas_enviadas} de ${p.max_propuestas} propuestas.</p>`, ["Ver la propuesta", link("/#mis-proyectos")]),
-          `Nueva propuesta de ${pro.nombre} para ${p.titulo}`, "/#mis-proyectos");
+          `Nueva propuesta de ${pro.nombre} para ${p.titulo}`, "/#mis-proyectos", p.propuestas_enviadas === 1);
         a(pro, "Tu propuesta ya le llegó al cliente", plantilla("Propuesta enviada", `<p>Tu propuesta para <b>${esc(p.titulo)}</b> ya está en manos del cliente. Te avisamos si la acepta.</p>`),
           `Tu propuesta para ${p.titulo} le llegó al cliente`, "/#mis-propuestas");
         if (p.estado === "completo")
           avisos.push({ para: cli.id, email: cli.email, subject: `Completaste el cupo de propuestas: ${p.titulo}`,
             html: plantilla("Ya tenés todas las propuestas que pediste", `<p>Recibiste las <b>${p.max_propuestas}</b> propuestas que pediste para <b>${esc(p.titulo)}</b>. Ya no llegan más.</p><p>Compará y elegí una. Si ninguna te convence, podés reabrir el proyecto con más cupos.</p>`, ["Ver las propuestas", link("/#mis-proyectos")]),
-            notif: `Se completó el cupo de ${p.titulo}: ya podés elegir`, link: "/#mis-proyectos" });
+            notif: `Se completó el cupo de ${p.titulo}: ya podés elegir`, link: "/#mis-proyectos", mail: true });
       }
       if (evento === "propuesta_aceptada" && pr.estado === "aceptada" && p.origen === "publicado") {
         a(pro, `¡Aceptaron tu propuesta! ${p.titulo}`, plantilla("¡Aceptaron tu propuesta!", `<p><b>${esc(cli.nombre)}</b> aceptó tu propuesta para <b>${esc(p.titulo)}</b>. Estos son sus datos para coordinar:</p><p>WhatsApp: <b>${esc(cli.whatsapp)}</b><br>Email: <b>${esc(cli.email)}</b></p><p>Revisen juntos las etapas del acuerdo en la Red: anticipo, entregas y saldo.</p>`, ["Escribirle por WhatsApp", waLink(cli.whatsapp)]),
-          `¡Aceptaron tu propuesta para ${p.titulo}!`, "/#mis-propuestas");
+          `¡Aceptaron tu propuesta para ${p.titulo}!`, "/#mis-propuestas", true);
         a(cli, `Datos de ${pro.nombre} para coordinar`, plantilla("Ya pueden coordinar", `<p>Aceptaste la propuesta de <b>${esc(pro.nombre)}</b>. Sus datos:</p><p>WhatsApp: <b>${esc(pro.whatsapp)}</b><br>Email: <b>${esc(pro.email)}</b></p><p>El pago lo acuerdan entre ustedes. En la Red pueden registrar las etapas: anticipo, entregas y saldo.</p>`, ["Ver el acuerdo", link("/#mis-proyectos")]),
-          `Aceptaste la propuesta de ${pro.nombre}: ya tenés sus datos`, "/#mis-proyectos");
+          `Aceptaste la propuesta de ${pro.nombre}: ya tenés sus datos`, "/#mis-proyectos", true);
         if (pr.firmante && pr.firmante_estado === "aceptado") {
           const f = await perfil(pr.firmante);
           a(f, "Se aceptó la propuesta que vas a firmar", plantilla("La propuesta fue aceptada", `<p>El cliente aceptó la propuesta de <b>${esc(pro.nombre)}</b> para <b>${esc(p.titulo)}</b>, donde figurás como firmante. Coordiná con ${esc(pro.nombre)} los pasos para la firma.</p>`),
@@ -112,9 +114,9 @@ Deno.serve(async (req) => {
           `Pedido nuevo de ${cli.nombre}: ${sv.titulo}`, "/#mis-servicios");
       if (evento === "solicitud_aceptada" && s.estado === "aceptada") {
         a(cli, `${pro.nombre} aceptó tu pedido`, plantilla("Aceptaron tu pedido", `<p><b>${esc(pro.nombre)}</b> aceptó tu pedido de <b>${esc(sv.titulo)}</b>. Sus datos:</p><p>WhatsApp: <b>${esc(pro.whatsapp)}</b><br>Email: <b>${esc(pro.email)}</b></p>`, ["Ver el acuerdo", link("/#mis-proyectos")]),
-          `${pro.nombre} aceptó tu pedido de ${sv.titulo}`, "/#mis-proyectos");
+          `${pro.nombre} aceptó tu pedido de ${sv.titulo}`, "/#mis-proyectos", true);
         a(pro, `Datos de ${cli.nombre} para coordinar`, plantilla("Pedido aceptado", `<p>Aceptaste el pedido de <b>${esc(cli.nombre)}</b>. Sus datos:</p><p>WhatsApp: <b>${esc(cli.whatsapp)}</b><br>Email: <b>${esc(cli.email)}</b></p>`, ["Escribirle por WhatsApp", waLink(cli.whatsapp)]),
-          `Aceptaste el pedido de ${cli.nombre}: ya tenés sus datos`, "/#mis-propuestas");
+          `Aceptaste el pedido de ${cli.nombre}: ya tenés sus datos`, "/#mis-propuestas", true);
       }
       if (evento === "solicitud_rechazada" && s.estado === "rechazada")
         a(cli, `Tu pedido de ${sv.titulo} no fue aceptado`, plantilla("Tu pedido no pudo tomarse", `<p>${esc(pro.nombre)} no puede tomar este pedido ahora. Podés pedírselo a otro profesional o publicar tu proyecto para recibir propuestas.</p>`, ["Publicar mi proyecto", link("/")]),
@@ -154,6 +156,25 @@ Deno.serve(async (req) => {
     }
   } catch (e) { return new Response("error leyendo datos: " + String(e), { status: 500 }); }
 
+  // push al celular
+  const { data: claves } = await db.from("red_secretos").select("clave,valor").in("clave", ["vapid_public", "vapid_private"]);
+  const kv = Object.fromEntries((claves || []).map((r: { clave: string; valor: string }) => [r.clave, r.valor]));
+  const pushOk = !!(kv.vapid_public && kv.vapid_private);
+  if (pushOk) webpush.setVapidDetails("mailto:hola@proyectamas.com.ar", kv.vapid_public, kv.vapid_private);
+  const empujar = async (usuarios: string[], titulo: string, path: string) => {
+    if (!pushOk || !usuarios.length) return;
+    const { data: subs } = await db.from("push_suscripciones").select("*").in("usuario", usuarios);
+    for (const sub of subs || []) {
+      try {
+        await webpush.sendNotification({ endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth } },
+          JSON.stringify({ title: "Red Proyecta Más", body: titulo, url: path }), { TTL: 86400 });
+      } catch (e) {
+        const code = (e as { statusCode?: number }).statusCode;
+        if (code === 404 || code === 410) await db.from("push_suscripciones").delete().eq("id", sub.id);
+      }
+    }
+  };
+
   // admins para las notificaciones internas
   let admins: string[] = [];
   if (avisos.some((x) => x.para === "ADMIN"))
@@ -166,7 +187,8 @@ Deno.serve(async (req) => {
     if (dup) continue; // ya se avisó
     const destinos = m.para === "ADMIN" ? admins : [m.para];
     if (destinos.length) await db.from("notificaciones").insert(destinos.map((p) => ({ para: p, titulo: m.notif, link: m.link })));
-    if (!m.email) continue;
+    await empujar(destinos, m.notif, m.link);
+    if (!m.mail || !m.email) continue;
     const r = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },

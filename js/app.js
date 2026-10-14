@@ -122,7 +122,7 @@ sb.auth.onAuthStateChange((ev, session) => {
   uidPrevio = uid;
   setTimeout(async () => { await cargarYo(); router(); vigilarNotif(); if (uid) { tutoAuto(); agendaSiPro(); } }, 0);
 });
-$("#logout").onclick = async () => { await sb.auth.signOut(); location.hash = ""; toast("Cerraste sesión"); };
+$("#logout").onclick = async () => { await quitarPushDeEsteDispositivo(); await sb.auth.signOut(); location.hash = ""; toast("Cerraste sesión"); };
 $("#umbtn").onclick = e => { e.stopPropagation(); const l = $("#umlist"); l.hidden = !l.hidden; $("#umbtn").setAttribute("aria-expanded", String(!l.hidden)); };
 document.addEventListener("click", () => { $("#umlist").hidden = true; });
 
@@ -803,6 +803,28 @@ function editarServicio(s) {
   };
 }
 
+/* ---------- fotos: se achican antes de subir (máx. ~200 KB) ---------- */
+async function comprimirImagen(file, maxLado = 1600, maxBytes = 200 * 1024) {
+  if (!/^image\//.test(file.type)) throw new Error("El archivo no es una imagen.");
+  if (file.size > 25 * 1024 * 1024) throw new Error("La imagen pesa más de 25 MB. Probá con otra.");
+  let img;
+  try { img = await createImageBitmap(file, { imageOrientation: "from-image" }); }
+  catch { img = await new Promise((ok, mal) => { const i = new Image(); i.onload = () => ok(i); i.onerror = () => mal(new Error("No pudimos leer la imagen.")); i.src = URL.createObjectURL(file); }); }
+  const w0 = img.width, h0 = img.height;
+  const webp = document.createElement("canvas").toDataURL("image/webp").startsWith("data:image/webp");
+  const tipo = webp ? "image/webp" : "image/jpeg";
+  let lado = maxLado, calidad = 0.82, blob = null;
+  for (let i = 0; i < 12; i++) {
+    const k = Math.min(1, lado / Math.max(w0, h0)), w = Math.round(w0 * k), h = Math.round(h0 * k);
+    const c = document.createElement("canvas"); c.width = w; c.height = h;
+    const ctx = c.getContext("2d"); ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, w, h); ctx.drawImage(img, 0, 0, w, h);
+    blob = await new Promise(r => c.toBlob(r, tipo, calidad));
+    if (blob && blob.size <= maxBytes) break;
+    if (calidad > 0.5) calidad -= 0.1; else lado = Math.round(lado * 0.8);
+  }
+  return { blob, tipo, ext: webp ? "webp" : "jpg" };
+}
+
 /* ---------- mi perfil ---------- */
 async function miPerfil() {
   const box = $("#perfilbox"), m = S.me, c = S.contacto || {};
@@ -812,8 +834,8 @@ async function miPerfil() {
     <div class="meta">${pro ? sellos(m) || '<span class="badge warn">Sin verificar</span>' : ""}${pro ? `<a href="#pro-${m.id}">Ver mi perfil público</a>` : ""}</div>
     ${pro && !m.verificado ? `<div class="note">Para obtener el sello <b>Verificado</b>, mandanos por WhatsApp una foto de tu DNI y, si tenés, de tu credencial de matrícula. <a class="btn wa sm" target="_blank" rel="noopener" href="${waNico(`Hola, soy ${m.nombre} y quiero verificar mi perfil en la Red Proyecta Más.`)}">Pedir verificación</a></div>` : ""}
     <div class="formbox fotobox" style="max-width:820px">${avatar(m, "av big")}
-      <div style="display:grid;gap:6px"><b>Tu foto</b><span class="fine" style="margin:0">Una foto de tu cara, clara y de frente, genera más confianza${pro ? " y te ayuda a conseguir más trabajos" : ""}. JPG, PNG o WEBP, hasta 5 MB.</span>
-      <div class="inline"><label class="btn o sm" style="cursor:pointer">${m.foto ? "Cambiar foto" : "Subir foto"}<input type="file" id="fotoin" accept="image/jpeg,image/png,image/webp" hidden></label>${m.foto ? `<button type="button" class="linkbtn" id="fotodel">Quitar</button>` : ""}</div></div></div>
+      <div style="display:grid;gap:6px"><b>Tu foto</b><span class="fine" style="margin:0">Una foto de tu cara, clara y de frente, genera más confianza${pro ? " y te ayuda a conseguir más trabajos" : ""}. JPG, PNG o WEBP; la achicamos automáticamente.</span>
+      <div class="inline"><label class="btn o sm" style="cursor:pointer">${m.foto ? "Cambiar foto" : "Subir foto"}<input type="file" id="fotoin" accept="image/*" hidden></label>${m.foto ? `<button type="button" class="linkbtn" id="fotodel">Quitar</button>` : ""}</div></div></div>
     <form id="pf" class="formbox" style="max-width:820px">
       <div class="row"><label class="f">${pro ? "Nombre y apellido" : "Nombre o razón social"}<input name="nombre" required minlength="2" maxlength="120" value="${esc(m.nombre)}"></label>
         <label class="f">WhatsApp<input name="wa" required maxlength="30" value="${esc(c.whatsapp || "")}"></label></div>
@@ -826,20 +848,19 @@ async function miPerfil() {
         <label class="f">Portfolio externo<input name="port" maxlength="300" value="${esc(m.portfolio || "")}"></label>` : `<label class="f">Tipo<select name="tc">${["Particular", "Estudio", "Empresa"].map(t => `<option ${m.tipo_cliente === t ? "selected" : ""}>${t}</option>`).join("")}</select></label>`}
       <div><button class="btn" type="submit">Guardar cambios</button></div></form>
     ${pro ? `<div class="formbox" style="max-width:820px;margin-top:16px"><h2 style="font:700 20px var(--f-body);margin:0">Mis trabajos</h2>
-      <p class="fine" style="margin:0">Subí de 3 a 6 imágenes de tus mejores trabajos (JPG, PNG o WEBP, hasta 5 MB). Sirven los de facultad o proyectos propios.</p>
+      <p class="fine" style="margin:0">Subí de 3 a 6 imágenes de tus mejores trabajos (JPG, PNG o WEBP; la achicamos automáticamente). Sirven los de facultad o proyectos propios.</p>
       <div class="gallery">${port.map(f => `<figure><img src="${esc(foto(f.imagen_path))}" alt="${esc(f.titulo)}"><figcaption><b>${esc(f.titulo)}</b> <button class="linkbtn" data-delp="${f.id}" data-path="${esc(f.imagen_path)}">Quitar</button></figcaption></figure>`).join("")}</div>
-      <form id="upf" style="display:grid;gap:10px"><div class="row"><label class="f">Título del trabajo<input name="t" required maxlength="120" placeholder="Vivienda en lote angosto"></label><label class="f">Imagen<input name="f" type="file" accept="image/jpeg,image/png,image/webp" required></label></div>
+      <form id="upf" style="display:grid;gap:10px"><div class="row"><label class="f">Título del trabajo<input name="t" required maxlength="120" placeholder="Vivienda en lote angosto"></label><label class="f">Imagen<input name="f" type="file" accept="image/*" required></label></div>
       <label class="f">Descripción <small>Opcional</small><input name="d" maxlength="1000"></label><div><button class="btn o" type="submit">Subir</button></div></form></div>` : ""}
     ${m.rol !== "admin" ? `<div class="formbox danger" style="max-width:820px;margin-top:16px"><h2 style="font:700 20px var(--f-body);margin:0">Eliminar mi cuenta</h2>
       <p class="fine" style="margin:0">Se borran tu perfil, tus datos de contacto${pro ? ", tus propuestas, tus trabajos del portfolio, tus servicios" : ", tus proyectos con sus preguntas y propuestas"} y tus calificaciones. No se puede deshacer. Si tenés un trabajo en curso, primero terminalo o cerralo.</p>
       <div><button type="button" class="btn o sm" id="delacc">Eliminar mi cuenta</button></div></div>` : ""}`;
   $("#fotoin").onchange = async e => {
     const file = e.target.files[0]; if (!file) return;
-    if (file.size > 5 * 1024 * 1024) { toast("La foto pesa más de 5 MB. Achicala y probá de nuevo."); return; }
-    const ext = (file.type.split("/")[1] || "jpg").replace("jpeg", "jpg");
-    const path = `${S.user.id}/foto-${Date.now()}.${ext}`;
     try {
-      await q(sb.storage.from("portfolio").upload(path, file, { contentType: file.type }));
+      const c = await comprimirImagen(file, 480);
+      const path = `${S.user.id}/foto-${Date.now()}.${c.ext}`;
+      await q(sb.storage.from("portfolio").upload(path, c.blob, { contentType: c.tipo }));
       const vieja = S.me.foto;
       await q(sb.from("perfiles").update({ foto: path }).eq("id", S.user.id));
       if (vieja) sb.storage.from("portfolio").remove([vieja]);
@@ -860,10 +881,12 @@ async function miPerfil() {
   };
   if ($("#upf")) $("#upf").onsubmit = async e => {
     e.preventDefault(); const f = e.target, file = f.f.files[0]; const b = $("button", f);
-    if (!file) return; if (file.size > 5 * 1024 * 1024) { toast("La imagen pesa más de 5 MB. Achicala y probá de nuevo."); return; }
+    if (!file) return;
     busy(b, true, "Subiendo…");
-    const path = `${S.user.id}/${Date.now()}-${file.name.replace(/[^\w.-]+/g, "_").slice(-60)}`;
-    try { await q(sb.storage.from("portfolio").upload(path, file, { contentType: file.type })); await q(sb.from("portfolio").insert({ pro: S.user.id, titulo: f.t.value.trim(), descripcion: f.d.value.trim() || null, imagen_path: path, orden: port.length })); proCache = null; toast("Trabajo agregado"); miPerfil(); }
+    try {
+      const c = await comprimirImagen(file, 1600);
+      const path = `${S.user.id}/${Date.now()}-${file.name.replace(/\.[^.]+$/, "").replace(/[^\w-]+/g, "_").slice(-50)}.${c.ext}`;
+      await q(sb.storage.from("portfolio").upload(path, c.blob, { contentType: c.tipo })); await q(sb.from("portfolio").insert({ pro: S.user.id, titulo: f.t.value.trim(), descripcion: f.d.value.trim() || null, imagen_path: path, orden: port.length })); proCache = null; toast("Trabajo agregado"); miPerfil(); }
     catch (er) { toast(errMsg(er)); busy(b, false); }
   };
   if ($("#delacc")) $("#delacc").onclick = () => {
@@ -1083,6 +1106,7 @@ async function cargarNotif() {
   if (!S.user) { $("#bell").hidden = true; return; }
   const { count } = await sb.from("notificaciones").select("id", { count: "exact", head: true }).eq("para", S.user.id).eq("leida", false);
   const n = count || 0; $("#bell-n").textContent = n > 9 ? "9+" : n; $("#bell-n").hidden = !n;
+  $("#bell").classList.toggle("sinpush", !n && pushPendiente());
   $("#bell").setAttribute("aria-label", n ? `Avisos: ${n} sin leer` : "Avisos");
 }
 async function abrirNotif() {
@@ -1090,17 +1114,65 @@ async function abrirNotif() {
   l.innerHTML = `<div class="muted" style="padding:10px">Cargando…</div>`;
   const { data } = await sb.from("notificaciones").select("*").eq("para", S.user.id).order("created_at", { ascending: false }).limit(25);
   const rows = data || [];
-  l.innerHTML = `<div class="bellhead"><b>Avisos</b>${rows.some(r => !r.leida) ? `<button type="button" class="linkbtn" id="bell-all">Marcar todo leído</button>` : ""}</div>`
+  l.innerHTML = (pushPendiente() ? `<div class="pushbox"><b>Recibí los avisos en el celular</b><span>${esIOS && !instalada() ? "En iPhone primero instalá la app (Compartir → Agregar a inicio) y activalos desde ahí." : "Te llegan como los de cualquier app, aunque tengas la Red cerrada."}</span><button type="button" class="btn y sm" id="pushon">${esIOS && !instalada() ? "Cómo instalarla" : "Activar avisos"}</button></div>` : "")
+    + `<div class="bellhead"><b>Avisos</b>${rows.some(r => !r.leida) ? `<button type="button" class="linkbtn" id="bell-all">Marcar todo leído</button>` : ""}</div>`
     + (rows.length ? rows.map(r => `<a href="${esc(r.link || "#")}" class="bellitem ${r.leida ? "" : "nuevo"}" data-nid="${r.id}"><span>${esc(r.titulo)}</span><small>${ago(r.created_at)}</small></a>`).join("")
       : `<div class="muted" style="padding:12px">No tenés avisos todavía.</div>`);
   $$("[data-nid]", l).forEach(a => a.onclick = async () => { l.hidden = true; if (a.classList.contains("nuevo")) { await sb.from("notificaciones").update({ leida: true }).eq("id", +a.dataset.nid); cargarNotif(); } });
+  if ($("#pushon")) $("#pushon").onclick = e => { e.stopPropagation(); activarPush(); };
   if ($("#bell-all")) $("#bell-all").onclick = async e => { e.stopPropagation(); await sb.from("notificaciones").update({ leida: true }).eq("para", S.user.id).eq("leida", false); l.hidden = true; cargarNotif(); };
 }
 $("#bell").onclick = e => { e.stopPropagation(); $("#umlist").hidden = true; abrirNotif(); };
 $("#bell-list").addEventListener("click", e => e.stopPropagation());
 document.addEventListener("click", () => { $("#bell-list").hidden = true; });
-function vigilarNotif() { clearInterval(notifTimer); cargarNotif(); revisarPendientes(); if (S.user) notifTimer = setInterval(cargarNotif, 60000); }
+function vigilarNotif() { clearInterval(notifTimer); cargarNotif(); revisarPendientes(); sincronizarPush(); if (S.user) notifTimer = setInterval(cargarNotif, 60000); }
 addEventListener("focus", () => S.user && cargarNotif());
+
+/* ---------- app instalable y avisos al celular ---------- */
+const VAPID_PUBLIC = "BF56ckBZL7gliOb6H7hUV4FpAfLbpmBa2Whwq8rE4_91ZYw5CbnveuYJJvgfqSum3GL7CrMtJgD_Kw6DCIAn82M";
+const esIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+const instalada = () => matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
+const pushSoportado = () => "serviceWorker" in navigator && "PushManager" in window && "Notification" in window;
+let swReg = null, promptInstalar = null;
+if ("serviceWorker" in navigator) navigator.serviceWorker.register("/sw.js").then(r => { swReg = r; sincronizarPush(); }).catch(() => { });
+addEventListener("beforeinstallprompt", e => { e.preventDefault(); promptInstalar = e; $("#instalar").hidden = false; });
+addEventListener("appinstalled", () => { $("#instalar").hidden = true; toast("¡Listo! La Red quedó instalada en tu celular"); });
+if (esIOS && !instalada()) $("#instalar").hidden = false;
+$("#instalar").onclick = async () => {
+  if (promptInstalar) { promptInstalar.prompt(); await promptInstalar.userChoice; promptInstalar = null; $("#instalar").hidden = true; return; }
+  dialogo(`<div class="dlhead"><div><div class="eyebrow">Instalar la app</div><h2 id="auth-title" style="margin-top:4px">Tené la Red en tu celular</h2></div>${cerrarX}</div>
+    ${esIOS ? `<ol class="pasos"><li>Abrí esta página en <b>Safari</b>.</li><li>Tocá el botón <b>Compartir</b> (el cuadrado con la flecha hacia arriba).</li><li>Elegí <b>Agregar a inicio</b> y tocá <b>Agregar</b>.</li><li>Abrí la Red desde el ícono nuevo y activá los avisos en la campanita.</li></ol>`
+      : `<ol class="pasos"><li>Abrí el menú del navegador (los tres puntitos).</li><li>Elegí <b>Instalar app</b> o <b>Agregar a la pantalla principal</b>.</li><li>Abrí la Red desde el ícono nuevo.</li></ol>`}
+    <div class="inline"><button class="btn" data-close>Entendido</button></div>`, "auth");
+};
+function claveVapid() { const p = "=".repeat((4 - VAPID_PUBLIC.length % 4) % 4), b = atob((VAPID_PUBLIC + p).replace(/-/g, "+").replace(/_/g, "/")); return Uint8Array.from(b, c => c.charCodeAt(0)); }
+async function guardarSuscripcion(sub) {
+  const j = sub.toJSON();
+  await q(sb.rpc("registrar_push", { p_endpoint: j.endpoint, p_p256dh: j.keys.p256dh, p_auth: j.keys.auth }));
+}
+/* si este dispositivo ya dio permiso, lo dejamos asociado a quien ingresó */
+async function sincronizarPush() {
+  if (!swReg || !S.user || !pushSoportado() || Notification.permission !== "granted") return;
+  try { const sub = await swReg.pushManager.getSubscription(); if (sub) await guardarSuscripcion(sub); } catch { }
+}
+async function activarPush() {
+  if (!pushSoportado()) {
+    if (esIOS && !instalada()) { $("#bell-list").hidden = true; $("#instalar").click(); return; }
+    toast("Este navegador no permite avisos. Probá con Chrome o instalando la app."); return;
+  }
+  const perm = await Notification.requestPermission();
+  if (perm !== "granted") { toast("No diste permiso. Lo podés activar desde la configuración del navegador."); return; }
+  try {
+    swReg = swReg || await navigator.serviceWorker.ready;
+    const sub = await swReg.pushManager.getSubscription() || await swReg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: claveVapid() });
+    await guardarSuscripcion(sub);
+    toast("¡Listo! Te van a llegar los avisos a este dispositivo"); $("#bell-list").hidden = true;
+  } catch (er) { toast("No pudimos activar los avisos: " + errMsg(er)); }
+}
+async function quitarPushDeEsteDispositivo() {
+  try { const sub = swReg && await swReg.pushManager.getSubscription(); if (sub) await sb.from("push_suscripciones").delete().eq("endpoint", sub.endpoint); } catch { }
+}
+const pushPendiente = () => S.user && (!pushSoportado() ? (esIOS && !instalada()) : Notification.permission !== "granted");
 
 /* ---------- tutorial ---------- */
 const tutoClave = () => !S.user ? "visita" : esPro() ? "pro" : "cli";
